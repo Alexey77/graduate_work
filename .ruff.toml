@@ -1,0 +1,12 @@
+fix = true
+target-version = "py311"
+exclude = ["grpc_generated/**", "frontend-react/**"]
+
+[lint]
+select = ["F", "E", "W", "I", "UP", "YTT", "BLE", "COM", "C4", "T10", "EM", "ISC", "ICN", "T20", "PYI", "RSE", "SIM", "TID", "TCH", "INT", "RUF100"]
+ignore = ["COM812", "E501", "ANN101"]
+
+[lint.per-file-ignores]
+"test_*.py" = ["S101"]
+"__init__.py" = ["F401"]
+"*/migrations/*.py" = ["E501"]
