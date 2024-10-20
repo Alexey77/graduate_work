@@ -1,0 +1,6 @@
+grpcio-tools~=1.67.0
+grpcio~=1.67.0
+langchain~=0.3.3
+loguru~=0.7.2
+pydantic-settings~=2.5.2
+sentence-transformers~=3.2.0
