@@ -4,6 +4,7 @@ import uvicorn
 from api.v1 import assistant, healthy
 from core.config import settings
 from core.logger import get_logger
+from database.mongodb import AsyncMongoClient
 from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 
@@ -14,6 +15,7 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("Service started")
+    app.state.mongo_client = AsyncMongoClient(settings.MONGO.uri)
     # app.state.db  =
 
     yield
@@ -21,6 +23,7 @@ async def lifespan(app: FastAPI):
     # Shutdown
 
     # app.state.db.close()
+    await app.state.mongo_client.close()
     logger.info("Service stopped")
 
 
