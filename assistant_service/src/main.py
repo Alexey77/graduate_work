@@ -15,7 +15,7 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("Service started")
-    app.state.mongo_client = AsyncMongoClient(settings.MONGO.uri)
+    app.state.mongo = AsyncMongoClient(settings.MONGO.uri)
     # app.state.db  =
 
     yield
@@ -23,7 +23,7 @@ async def lifespan(app: FastAPI):
     # Shutdown
 
     # app.state.db.close()
-    await app.state.mongo_client.close()
+    await app.state.mongo.close()
     logger.info("Service stopped")
 
 

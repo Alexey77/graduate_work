@@ -10,10 +10,10 @@ class AuthService:
         pass
         # self._db = db
 
-    async def validate_access_token(self, access_token: str, **kwargs) -> bool:
+    async def validate_access_token(self, access_token: str) -> bool:
         return True
 
-    async def get_login_from_access_token(self, access_token: str, **kwargs) -> str | None:
+    async def get_login_from_access_token(self, access_token: str) -> str | None:
         return "morty.smith@earth.dimensionC137"
 
 

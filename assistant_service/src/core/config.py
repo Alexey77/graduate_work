@@ -33,7 +33,7 @@ class MongoDBSettings(BaseSettings):
     @property
     def uri(self) -> str:
         if self.USER and self.PASSWORD:
-            return f'mongodb://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DB_NAME}'
+            return f'mongodb://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/?authMechanism=DEFAULT'
         return f'mongodb://{self.HOST}:{self.PORT}/{self.DB_NAME}'
 
     model_config = SettingsConfigDict(

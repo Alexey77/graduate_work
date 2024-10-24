@@ -7,7 +7,7 @@ from pydantic import UUID4, BaseModel, Field
 
 # Request
 class RequestAsk(BaseModel):
-    session: UUID4 | None = None
+    dialogue: UUID4 | None = None
     content: Annotated[str, Field(min_length=1, max_length=4096)]
 
 class RequestReply(BaseModel):

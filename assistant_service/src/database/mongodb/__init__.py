@@ -29,8 +29,8 @@ class AsyncMongoClient:
 
 
 class AsyncMongoBase:
-    def __init__(self, mongo_client: AsyncMongoClient) -> None:
-        self._client = mongo_client.client
+    def __init__(self, client: AsyncMongoClient) -> None:
+        self._client = client.client
 
     async def _insert_one(self, database: str, collection: str, document: dict) -> InsertOneResult:
         try:
