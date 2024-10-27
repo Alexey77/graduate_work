@@ -1,0 +1,8 @@
+aio-pika~=9.4.3
+fastapi~=0.115.2
+loguru~=0.7.2
+pydantic~=2.9.2
+pydantic-settings~=2.6.0
+uvicorn~=0.32.0
+orjson~=3.10.9
+motor~=3.6.0

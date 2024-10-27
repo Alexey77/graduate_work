@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package llmservice;
+
+enum ApiServiceName {
+  OPENAI = 0;
+  ANTHROPIC = 1;
+  GOOGLE = 2;
+  PROXYAPI = 3;
+
+}
+
+message LLMRequest {
+  ApiServiceName service = 1;
+  string model = 2;
+  string system = 3;
+  int32 max_tokens = 4;
+  string dialogue = 5;
+}
+
+message LLMResponse {
+  int32 status_code = 1;
+  string reply = 2;
+  string response = 3;
+}
+
+service LlmService {
+  rpc GetCompletion (LLMRequest) returns (LLMResponse);
+}
