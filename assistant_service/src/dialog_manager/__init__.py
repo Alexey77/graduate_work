@@ -1,12 +1,12 @@
-from pydantic import UUID4
 from functools import lru_cache
 
 from core.logger import get_logger
 from database.mongodb.dialog import DialoguesMongoDB
 from dependencies import get_db_dialogue
 from fastapi import Depends
+from pydantic import UUID4
 
-from dialog_manager.messages import get_system_message, get_message_user
+from dialog_manager.messages import get_message_user, get_system_message
 from dialog_manager.models import DialogModel
 
 logger = get_logger(__name__)

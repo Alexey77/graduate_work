@@ -1,7 +1,5 @@
 import aio_pika
-
-from aio_pika.abc import AbstractRobustConnection, AbstractRobustChannel
-
+from aio_pika.abc import AbstractRobustChannel, AbstractRobustConnection
 from core.config import RabbitMQSettings
 
 from .base_connection import IAsyncQueueConnection

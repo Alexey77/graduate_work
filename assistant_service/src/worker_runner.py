@@ -1,4 +1,5 @@
 import asyncio
+
 from core.config import settings
 from queues.rabbitmq_connection import RabbitMQConnection
 

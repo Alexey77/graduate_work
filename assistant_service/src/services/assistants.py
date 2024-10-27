@@ -18,7 +18,7 @@ class AssistantsService:
         return await self._dialog.create_dialog(content=content, user=user)
 
     async def _update_dialogue(self, ask: str, id_dialog: UUID4 | None, user: str) -> UUID4:
-        raise NotImplemented
+        raise NotImplementedError
 
     async def create_or_update_dialogue(self, content: str, id_dialog: UUID4 | None, user: str) -> UUID4:
 
