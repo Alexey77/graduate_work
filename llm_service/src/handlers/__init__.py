@@ -57,7 +57,7 @@ class LLMHandler(llm_pb2_grpc.LlmServiceServicer):
             )
             logger.info(f"Request processed successfully with status code: {status_code}")
 
-            reply=json.dumps(service.get_reply(response=response), ensure_ascii=False)
+            reply = json.dumps(service.get_reply(response=response), ensure_ascii=False)
             response = json.dumps(response, ensure_ascii=False)
 
             return LLMResponse(
@@ -74,8 +74,9 @@ class LLMHandler(llm_pb2_grpc.LlmServiceServicer):
                 status_code=503,
                 response=str(e)
             )
-        except Exception as e:
-            logger.error(f"Unhandled exception encountered:{e}")
+        except Exception as e: # noqa: BLE001
+            msg = f"Unhandled exception encountered:{e}"
+            logger.error(msg)
             context.set_code(StatusCode.INTERNAL)
             context.set_details(str(e))
             return LLMResponse(

@@ -1,6 +1,6 @@
 fix = true
 target-version = "py311"
-exclude = ["text_vector_service/src/grpc_generated/**", "frontend-react/**"]
+exclude = ["*/grpc_generated/**", "frontend-react/**"]
 
 
 
