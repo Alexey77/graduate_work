@@ -15,7 +15,7 @@ message LLMRequest {
   string model = 2;
   string system = 3;
   int32 max_tokens = 4;
-  string dialogue = 5;
+  string messages = 5;
 }
 
 message LLMResponse {

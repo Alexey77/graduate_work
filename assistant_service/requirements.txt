@@ -1,4 +1,6 @@
 aio-pika~=9.4.3
+grpcio~=1.67.0
+grpcio-tools~=1.67.0
 fastapi~=0.115.2
 loguru~=0.7.2
 pydantic~=2.9.2

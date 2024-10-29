@@ -33,10 +33,10 @@ class OpenAIService(BaseLLMService):
         logger.debug(f"Prepared messages: {messages}")
         return messages
 
-    def prepare_data(self, model_name: str, system_prompt: str, max_tokens: int, dialogue: list[dict]) -> dict:
+    def prepare_data(self, model_name: str, system_prompt: str, max_tokens: int, messages: list[dict]) -> dict:
         data = {
             "model": model_name,
-            "messages": self.prepare_messages(system_prompt, dialogue),
+            "messages": self.prepare_messages(system_prompt, messages),
             "max_tokens": max_tokens
         }
         logger.info(f"Prepared data with model: {model_name}, max_tokens: {max_tokens}")
