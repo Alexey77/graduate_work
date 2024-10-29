@@ -44,5 +44,4 @@ async def serve():
 
 
 if __name__ == '__main__':
-    # serve()
     asyncio.run(serve())

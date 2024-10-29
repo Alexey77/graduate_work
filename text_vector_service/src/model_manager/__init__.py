@@ -1,6 +1,7 @@
 import torch
+
 from core.logger import get_logger
-from core.settings import EncoderSettings, encoder_settings
+from core.config import EncoderSettings, encoder_settings
 from sentence_transformers import SentenceTransformer
 
 logger = get_logger(__name__)

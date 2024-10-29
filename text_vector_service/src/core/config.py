@@ -7,7 +7,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class GRPCServerSettings(BaseSettings):
     HOST: Annotated[str, Field(min_length=1)]
     PORT: Annotated[int, Field(gt=1023, lt=65536)]
-    MAX_WORKERS: Annotated[int, Field(gt=0)]
     TIMEOUT: Annotated[int, Field(gt=0)]
 
     model_config = SettingsConfigDict(
