@@ -3,6 +3,8 @@ from database.mongodb import AsyncMongoClient
 from database.mongodb.dialog import DialoguesMongoDB
 from fastapi import Depends, FastAPI
 
+from llm_service import LLMClient
+
 
 def get_app() -> FastAPI:
     from main import app
@@ -18,5 +20,5 @@ def get_db_dialogue(mongo: AsyncMongoClient = Depends(get_mongo)) -> DialoguesMo
                             db_name=settings.MONGO.DB_NAME,
                             collection_name=settings.MONGO.COLLECTION_NAME)
 
-# def get_db(app: FastAPI = Depends(get_app)) -> DatabaseConnection:
-#     return app.state.db
+def get_llm_client(app: FastAPI = Depends(get_app)) -> LLMClient:
+    return app.state.llm_service

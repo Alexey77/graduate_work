@@ -69,4 +69,3 @@ async def reply(
         messages = await assist_service.unauthorized_reply()
         return ReplyResponseModel(messages=messages)
 
-    # return ResponseMessage(message="Service is running")

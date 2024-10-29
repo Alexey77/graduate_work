@@ -38,14 +38,14 @@ class LLMHandler(llm_pb2_grpc.LlmServiceServicer):
             logger.info(f"Received request with service: {service_name} and model: {request.model}")
             service = get_llm_service(service_name)
 
-            dialogue: list[dict] = json.loads(request.dialogue)
+            messages: list[dict] = json.loads(request.messages)
             logger.debug("Parsed dialogue successfully")
 
             data = service.prepare_data(
                 model_name=request.model,
                 system_prompt=request.system,
                 max_tokens=request.max_tokens,
-                dialogue=dialogue
+                messages=messages
             )
             logger.debug(f"Data prepared for service request: {data}")
 
