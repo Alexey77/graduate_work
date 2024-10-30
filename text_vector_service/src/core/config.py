@@ -18,7 +18,7 @@ class GRPCServerSettings(BaseSettings):
 
 class EncoderSettings(BaseSettings):
     LOCAL_MODEL_PATH: Annotated[str, Field(min_length=1)]
-    DEFAULT_MODEL_NAME: Annotated[str, Field(min_length=1)]
+    MODEL_NAME: Annotated[str, Field(min_length=1)]
 
     ALLOWED_MODELS: set[str] = {
         "paraphrase-multilingual-mpnet-base-v2",
