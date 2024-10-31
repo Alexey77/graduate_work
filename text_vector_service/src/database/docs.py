@@ -1,4 +1,5 @@
 import logging
+
 from qdrant_client import models
 
 from . import BaseQdrantClient

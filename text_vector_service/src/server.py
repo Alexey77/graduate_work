@@ -8,7 +8,6 @@ import grpc
 from core.config import encoder_settings, vector_db_settings
 from core.config import grpc_server_settings as settings
 from core.logger import get_logger
-
 from model_manager import ModelManager
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -29,7 +28,7 @@ async def stop_server(server, db_connection):
     logger.info("Server stopped successfully.")
 
     # await db_connection.close()
-    db_connection = False
+    db_connection = False # noqa F841
     logger.info("Database connection closed successfully.")
 
 
