@@ -7,7 +7,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class GRPCServerSettings(BaseSettings):
     HOST: Annotated[str, Field(min_length=1)]
     PORT: Annotated[int, Field(gt=1023, lt=65536)]
-    MAX_WORKERS: Annotated[int, Field(gt=0)]
     TIMEOUT: Annotated[int, Field(gt=0)]
 
     model_config = SettingsConfigDict(
@@ -17,9 +16,22 @@ class GRPCServerSettings(BaseSettings):
         env_file_encoding='utf-8')
 
 
+class VectorDBSettings(BaseSettings):
+    HOST: Annotated[str, Field(min_length=1)]
+    PORT: Annotated[int, Field(gt=1023, lt=65536)]
+    COLLECTION_NAME: Annotated[str, Field(min_length=1)]
+    VECTOR_SIZE: Annotated[int, Field(gt=64, lt=16_384)]
+
+    model_config = SettingsConfigDict(
+        env_prefix='QDRANT_',
+        env_file='.env',
+        extra='ignore',
+        env_file_encoding='utf-8')
+
+
 class EncoderSettings(BaseSettings):
     LOCAL_MODEL_PATH: Annotated[str, Field(min_length=1)]
-    DEFAULT_MODEL_NAME: Annotated[str, Field(min_length=1)]
+    MODEL_NAME: Annotated[str, Field(min_length=1)]
 
     ALLOWED_MODELS: set[str] = {
         "paraphrase-multilingual-mpnet-base-v2",
@@ -37,3 +49,4 @@ class EncoderSettings(BaseSettings):
 
 grpc_server_settings = GRPCServerSettings()
 encoder_settings = EncoderSettings()
+vector_db_settings = VectorDBSettings()

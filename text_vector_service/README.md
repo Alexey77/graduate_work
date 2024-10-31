@@ -2,7 +2,15 @@
 
 ### Generating client and server code
 
-`python -m grpc_tools.protoc -I./common/protos --python_out=./text_vector_service/src/grpc_generated --grpc_python_out=./text_vector_service/src/grpc_generated ./common/protos/encoder.proto`
+## EncoderService
+
+root path \text_vector_service
+
+`python -m grpc_tools.protoc -I../common/protos --python_out=./src/grpc_generated --grpc_python_out=./src/grpc_generated ../common/protos/encoder.proto`
+
+## SimilaritySearchService
+`python -m grpc_tools.protoc -I../common/protos --python_out=./src/grpc_generated --grpc_python_out=./src/grpc_generated ../common/protos/similarity_search.proto`
+
 
 `docker build -t llm_service .`
 

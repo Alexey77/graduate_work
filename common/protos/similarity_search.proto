@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package similarity_search;
+
+service SimilaritySearchService  {
+  rpc SearchSimilarFragments (SearchRequest) returns (SearchResponse);
+}
+
+
+message SearchRequest {
+  string text = 1;
+  string collection = 2;
+  int32 limit = 3;
+}
+
+message FragmentResult {
+  string text = 1;
+  string meta = 2;
+  float score = 3;
+}
+
+
+message SearchResponse {
+  repeated FragmentResult similar_fragments = 1;
+}
+
+
+

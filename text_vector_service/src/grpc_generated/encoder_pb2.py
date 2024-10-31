@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rencoder.proto\x12\x0e\x65ncoderservice\"1\n\rEncodeRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x12\n\nmodel_name\x18\x02 \x01(\t\"4\n\x0e\x45ncodeResponse\x12\x0e\n\x06vector\x18\x01 \x03(\x02\x12\x12\n\nmodel_name\x18\x02 \x01(\t\"6\n\x12\x43ountTokensRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x12\n\nmodel_name\x18\x02 \x01(\t\">\n\x13\x43ountTokensResponse\x12\x13\n\x0btoken_count\x18\x01 \x01(\x05\x12\x12\n\nmodel_name\x18\x02 \x01(\t\"E\n\x10SplitTextRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x12\n\nchunk_size\x18\x02 \x01(\x05\x12\x0f\n\x07overlap\x18\x03 \x01(\x05\"&\n\x11SplitTextResponse\x12\x11\n\tfragments\x18\x01 \x03(\t2\x83\x02\n\x0e\x45ncoderService\x12G\n\x06\x45ncode\x12\x1d.encoderservice.EncodeRequest\x1a\x1e.encoderservice.EncodeResponse\x12V\n\x0b\x43ountTokens\x12\".encoderservice.CountTokensRequest\x1a#.encoderservice.CountTokensResponse\x12P\n\tSplitText\x12 .encoderservice.SplitTextRequest\x1a!.encoderservice.SplitTextResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\rencoder.proto\x12\x0e\x65ncoderservice\"\x1d\n\rEncodeRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\" \n\x0e\x45ncodeResponse\x12\x0e\n\x06vector\x18\x01 \x03(\x02\"\"\n\x12\x43ountTokensRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\"*\n\x13\x43ountTokensResponse\x12\x13\n\x0btoken_count\x18\x01 \x01(\x05\"E\n\x10SplitTextRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x12\n\nchunk_size\x18\x02 \x01(\x05\x12\x0f\n\x07overlap\x18\x03 \x01(\x05\"&\n\x11SplitTextResponse\x12\x11\n\tfragments\x18\x01 \x03(\t2\x83\x02\n\x0e\x45ncoderService\x12G\n\x06\x45ncode\x12\x1d.encoderservice.EncodeRequest\x1a\x1e.encoderservice.EncodeResponse\x12V\n\x0b\x43ountTokens\x12\".encoderservice.CountTokensRequest\x1a#.encoderservice.CountTokensResponse\x12P\n\tSplitText\x12 .encoderservice.SplitTextRequest\x1a!.encoderservice.SplitTextResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,17 +32,17 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'encoder_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_ENCODEREQUEST']._serialized_start=33
-  _globals['_ENCODEREQUEST']._serialized_end=82
-  _globals['_ENCODERESPONSE']._serialized_start=84
-  _globals['_ENCODERESPONSE']._serialized_end=136
-  _globals['_COUNTTOKENSREQUEST']._serialized_start=138
-  _globals['_COUNTTOKENSREQUEST']._serialized_end=192
-  _globals['_COUNTTOKENSRESPONSE']._serialized_start=194
-  _globals['_COUNTTOKENSRESPONSE']._serialized_end=256
-  _globals['_SPLITTEXTREQUEST']._serialized_start=258
-  _globals['_SPLITTEXTREQUEST']._serialized_end=327
-  _globals['_SPLITTEXTRESPONSE']._serialized_start=329
-  _globals['_SPLITTEXTRESPONSE']._serialized_end=367
-  _globals['_ENCODERSERVICE']._serialized_start=370
-  _globals['_ENCODERSERVICE']._serialized_end=629
+  _globals['_ENCODEREQUEST']._serialized_end=62
+  _globals['_ENCODERESPONSE']._serialized_start=64
+  _globals['_ENCODERESPONSE']._serialized_end=96
+  _globals['_COUNTTOKENSREQUEST']._serialized_start=98
+  _globals['_COUNTTOKENSREQUEST']._serialized_end=132
+  _globals['_COUNTTOKENSRESPONSE']._serialized_start=134
+  _globals['_COUNTTOKENSRESPONSE']._serialized_end=176
+  _globals['_SPLITTEXTREQUEST']._serialized_start=178
+  _globals['_SPLITTEXTREQUEST']._serialized_end=247
+  _globals['_SPLITTEXTRESPONSE']._serialized_start=249
+  _globals['_SPLITTEXTRESPONSE']._serialized_end=287
+  _globals['_ENCODERSERVICE']._serialized_start=290
+  _globals['_ENCODERSERVICE']._serialized_end=549
 # @@protoc_insertion_point(module_scope)
