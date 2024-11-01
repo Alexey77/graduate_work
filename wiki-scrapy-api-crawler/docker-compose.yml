@@ -1,0 +1,5 @@
+services:
+  wiki_crawler:
+    build: .
+    volumes:
+      - ./src/wiki_api_crawler/output:/app/src/wiki_api_crawler/output
