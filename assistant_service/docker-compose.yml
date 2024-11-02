@@ -1,4 +1,22 @@
 services:
+  assistant_service:
+    build: .
+    image: assistant_service
+    container_name: assistant_service
+    restart: always
+    expose:
+      - "8000"
+    ports:
+      - "8000:8000"
+    depends_on:
+      - rabbitmq
+      - mongo
+    env_file: .env
+    healthcheck:
+      test: ["CMD-SHELL", "curl -I http://localhost:8000/api/v1/healthy/live|| exit 1"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
   rabbitmq:
     image: rabbitmq:3.13.7-alpine
     hostname: ${RABBITMQ_HOST}

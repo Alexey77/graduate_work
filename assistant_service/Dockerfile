@@ -18,6 +18,10 @@ RUN apt-get update \
 RUN  pip install --upgrade pip\
      && pip install -r requirements.txt
 
+RUN groupadd -r web
+RUN useradd -r -g web web
+RUN chown -R web:web /app
+
 COPY . .
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+ENTRYPOINT ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
