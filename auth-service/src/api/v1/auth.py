@@ -2,22 +2,30 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from fastapi.responses import RedirectResponse
+from fastapi.security import OAuth2PasswordBearer
 from models.user_provider import UserProvider
-from schemas import (ResponseAuthTokens, ResponseMessage, ResponseUserHistory,
-                     ResponseUserPermissions, UserCredentials, UserPassUpdate,
-                     UserRegistration)
+from schemas import (
+    ResponseAuthTokens,
+    ResponseMessage,
+    ResponseUserHistory,
+    ResponseUserPermissions,
+    UserCredentials,
+    UserPassUpdate,
+    UserRegistration,
+)
 from services.auth import AuthException, IAsyncAuthService, get_auth_service
-from services.provider import (ProviderService, SocialException,
-                               get_provider_service)
+from services.provider import ProviderService, SocialException, get_provider_service
 from starlette.requests import Request
 
 router = APIRouter()
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="v1/auth/login")
 
-@router.get("/get_history",
+
+@router.get("/history",
             response_model=ResponseUserHistory,
             summary="История входов")
-async def history(access_token: str = Header(None),
+async def history(access_token: str = Depends(oauth2_scheme),
                   auth_service: IAsyncAuthService = Depends(get_auth_service)):
     if access_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -132,11 +140,11 @@ async def refresh_tokens(refresh_token: str = Header(None),
                             headers={"WWW-Authenticate": "Bearer"})
 
 
-@router.post("/logout",
+@router.delete("/logout",
              response_model=ResponseMessage,
              status_code=status.HTTP_200_OK,
              summary="Выйти из сессии на одном устройстве")
-async def user_logout(access_token: str = Header(None),
+async def user_logout(access_token: str = Depends(oauth2_scheme),
                       auth_service: IAsyncAuthService = Depends(get_auth_service)) -> ResponseMessage:
     if access_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -152,11 +160,11 @@ async def user_logout(access_token: str = Header(None),
                             headers={"WWW-Authenticate": "Bearer"})
 
 
-@router.post("/logout_all",
+@router.delete("/logout_all",
              response_model=ResponseMessage,
              status_code=status.HTTP_200_OK,
              summary="Выйти из сессии на всех устройствах")
-async def user_logout_all(access_token: str = Header(None),
+async def user_logout_all(access_token: str = Depends(oauth2_scheme),
                           auth_service: IAsyncAuthService = Depends(get_auth_service)) -> ResponseMessage:
     if access_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -176,7 +184,7 @@ async def user_logout_all(access_token: str = Header(None),
              response_model=ResponseMessage,
              status_code=status.HTTP_200_OK,
              summary="Проверить валидность access токена")
-async def validate(access_token: str = Header(None),
+async def validate(access_token: str = Depends(oauth2_scheme),
                    auth_service: IAsyncAuthService = Depends(get_auth_service)) -> ResponseMessage:
     if access_token is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -196,7 +204,7 @@ async def validate(access_token: str = Header(None),
 @router.get("/permissions",
             response_model=ResponseUserPermissions,
             summary="Пермишены пользователя")
-async def history_permissions(access_token: str = Header(None),
+async def history_permissions(access_token: str = Depends(oauth2_scheme),
                               auth_service: IAsyncAuthService = Depends(get_auth_service)):
 
     if access_token is None:
