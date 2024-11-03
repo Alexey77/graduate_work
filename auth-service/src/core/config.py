@@ -13,6 +13,7 @@ logging_config.dictConfig(LOGGING)
 class UserRole(str, Enum):
     ADMINISTRATOR = "admin"
     GUEST = "guest"
+    USER = "user"
 
 
 class Settings(BaseSettings):

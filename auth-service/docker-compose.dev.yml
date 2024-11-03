@@ -20,7 +20,7 @@ services:
       timeout: 2s
       retries: 5
     networks:
-      - auth-network
+      - common-net
 
   nginx:
     image: nginx:1.25.3
@@ -31,8 +31,6 @@ services:
     ports:
       - "81:80"
     restart: always
-    networks:
-      - auth-network
     depends_on:
       auth-service:
         condition: service_healthy
@@ -41,6 +39,8 @@ services:
       interval: 10s
       timeout: 2s
       retries: 5
+    networks:
+      - common-net
 
   redis:
     image: redis:7.2.4
@@ -50,13 +50,13 @@ services:
       - .env
     ports:
       - "6379:6379"
-    networks:
-      - auth-network
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG || exit 1" ]
       interval: 10s
       timeout: 2s
       retries: 5
+    networks:
+      - common-net
 
   jaeger:
     image: jaegertracing/all-in-one:latest
@@ -67,11 +67,11 @@ services:
       - "6832:6832/udp"
       - "5778:5778"
     restart: always
-    networks:
-      - auth-network
     depends_on:
       nginx:
         condition: service_healthy
+    networks:
+      - common-net
 
   auth-service:
     build: ./
@@ -88,7 +88,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - auth-network
+      - common-net
     healthcheck:
       test: ["CMD-SHELL", "curl --fail -H 'X-Request-Id: healthcheck' http://localhost:8000/api/v1/healthy/live || exit 1"]
       interval: 10s
@@ -96,4 +96,6 @@ services:
       retries: 5
 
 networks:
-  auth-network:
+  common-net:
+    external:
+        name: cinema_network

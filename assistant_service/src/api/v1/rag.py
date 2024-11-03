@@ -25,27 +25,13 @@ logger = get_logger(__name__)
 async def question(
         question_message: QuestionMessage,
         credentials: HTTPAuthorizationCredentials = Depends(security),
-
         questions_service: RAGService = Depends(get_rag_service),
         auth_service: AuthService = Depends(get_auth_service),
-
         user_agent: Annotated[str | None, Header()] = None
 ):
     access_token = credentials.credentials  # noqa F841
-
-    # if access_token is None or not await auth_service.validate_access_token(access_token):
-    #     logger.info("Authorization without a access token or the token is not valid")
-    #     raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-    #                         detail="Authorization without a access token or the token is not valid",
-    #                         headers={"WWW-Authenticate": "Bearer"})
-    #
-    # user = await auth_service.get_login_from_access_token(access_token=access_token)
-    #
-    # if user is None:
-    #     logger.info("Authorization of an unknown user")
-    #     raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED,
-    #                         detail="Authorization without a access token or the token is not valid",
-    #                         headers={"WWW-Authenticate": "Bearer"})
+    user = await auth_service.get_current_user(access_token, external_validation=True)
+    logger.info("User %s asked a question: %s", user.email, question_message.content)
 
     response = await questions_service.get_answer(messages={"role": Role.user.value,
                                                             "content": question_message.content})

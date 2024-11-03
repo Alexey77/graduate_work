@@ -84,7 +84,7 @@ class AuthService(IAsyncAuthService):
         if await self._db_user.get_user_by_login(user.login):
             raise AuthException(message="User duplication is not allowed")
 
-        role: Role = await self._db_role.get_role_by_name(role_name=UserRole.GUEST)
+        role: Role = await self._db_role.get_role_by_name(role_name=UserRole.USER)
         # Цель узнать id роли, чтобы позже использовать
         if role is None:
             # Защита, если база проинициализирована не правильно и в ней нет ролей

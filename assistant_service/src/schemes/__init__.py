@@ -59,6 +59,7 @@ class ResponseCreatedUnauthorizedAsk(ResponseCreatedAsk):
 
 class Role(str, Enum):
     user = "user"
+    guest = "guest"
     assistant = "assistant"
 
 
@@ -73,3 +74,8 @@ class ReplyResponseModel(BaseModel):
 
 class ResponseMessage(BaseModel):
     message: str
+
+
+class User(BaseModel):
+    email: str
+    roles: list[Role]
