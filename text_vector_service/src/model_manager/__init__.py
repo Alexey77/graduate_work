@@ -49,3 +49,13 @@ class ModelManager:
         if model_name not in self._models:
             self._load_model(model_name)
         return self._models[model_name]
+    def unload_models(self):
+        logger.info("Unloading all models to free up memory.")
+        for model_name, model in self._models.items():
+            del model
+            logger.info(f"Model '{model_name}' unloaded.")
+        self._models.clear()
+
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+            logger.info("Cleared GPU cache.")

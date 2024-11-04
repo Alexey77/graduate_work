@@ -1,3 +1,6 @@
+import json
+from datetime import datetime
+from itertools import count
 from pathlib import Path
 
 import torch
@@ -7,187 +10,114 @@ from qdrant_client.models import Distance, PointStruct, VectorParams
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
+
+#______________Скачай репу себе в проект_____________
 # https://github.com/JoannaBy/RussianNovels/tree/master
+INPUT_FOLDER = Path("/home/artem/Документы/graduate_work/RussianNovels/corpus")
 
-# ===========================
-# Configuration Variables
-# ===========================
+#______________Малая моделька_____________
+MODEL_NAME = "intfloat/multilingual-e5-small"
+VECTOR_SIZE = 384
 
-# Input folder containing text files
-INPUT_FOLDER = Path("/path/to/input/folder")  # Замените на ваш путь
+#______________Большая моделька_____________
+# MODEL_NAME = "intfloat/multilingual-e5-large"
+# VECTOR_SIZE = 1024
 
-# Text splitter configuration
-CHUNK_SIZE = 1000  # Настройте по необходимости
-CHUNK_OVERLAP = 100  # Настройте по необходимости
-
-# SentenceTransformer model configuration
-MODEL_NAME = "intfloat/multilingual-e5-large"
-VECTOR_SIZE = 1024
-
-# Qdrant configuration
+#______не в докере_______
 QDRANT_HOST = "localhost"
+
+#_______в докере
+# QDRANT_HOST = "qdrant"
+
+
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 100
 QDRANT_PORT = 6333
 QDRANT_COLLECTION_NAME = "text_fragments"
+BATCH_SIZE = 1000
+MAX_POINTS = 100
 
-# Batch size for Qdrant insertion
-BATCH_SIZE = 100
 
 
-# ===========================
-# Function Definitions
-# ===========================
+unique_id_counter = count(1)
+
+def create_snapshot(client: QdrantClient, collection_name: str):
+    snapshot_name = f"{collection_name}_snapshot_{datetime.now().strftime('%Y%m%d%H%M%S')}"
+    client.create_snapshot(collection_name=collection_name,)
+    print(f"Snapshot '{snapshot_name}' created successfully")
+
+
 
 def load_model(model_name: str) -> SentenceTransformer:
-    """
-    Load the SentenceTransformer model.
-    """
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    print(f"Loading model '{model_name}' on {device}...")  # noqa T201
-    model = SentenceTransformer(model_name, device=device)
-    print("Model loaded successfully.")  # noqa T201
-    return model
+    return SentenceTransformer(model_name, device='cuda' if torch.cuda.is_available() else 'cpu')
 
 
 def get_txt_files(folder: Path) -> list[Path]:
-    """
-    Retrieve all .txt files from the specified folder.
-    """
     return list(folder.glob("**/*.txt"))
 
 
 def read_file(file_path: Path) -> str:
-    """
-    Read the content of a text file.
-    """
     return file_path.read_text(encoding='utf-8')
 
 
 def split_text(text: str) -> list[str]:
-    """
-    Split text into smaller fragments using RecursiveCharacterTextSplitter.
-    """
-    text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE,
-        chunk_overlap=CHUNK_OVERLAP,
-        length_function=len,
-        is_separator_regex=False
-    )
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP,
+                                                   length_function=len)
     return text_splitter.split_text(text)
 
 
 def encode_texts(model: SentenceTransformer, texts: list[str]) -> list[list[float]]:
-    """
-    Encode a list of texts into vector representations.
-    """
-    return model.encode(texts, show_progress_bar=False, convert_to_numpy=True).tolist()
+    return model.encode(texts, show_progress_bar=True, convert_to_numpy=True).tolist()
 
 
 def prepare_points(fragments: list[str], vectors: list[list[float]], file_path: Path) -> list[PointStruct]:
-    """
-    Prepare Qdrant PointStruct objects with payload.
-    """
-    points = []
-    for fragment, vector in zip(fragments, vectors):
-        payload = {
-            "source": fragment,
-            "filename": str(file_path)
-        }
-        point = PointStruct(
-            vector=vector,
-            payload=payload
-        )
-        points.append(point)
-    return points
+    return [
+        PointStruct(id=next(unique_id_counter), vector=vector, payload={"source": fragment, "filename": str(file_path)})
+        for fragment, vector in zip(fragments, vectors)]
 
 
 def connect_qdrant(host: str, port: int, collection_name: str) -> QdrantClient:
-    """
-    Connect to Qdrant and create collection if it doesn't exist.
-    """
     client = QdrantClient(host=host, port=port)
-
-    # Проверка существования коллекции
-    existing_collections = client.get_collections().collections
-    collection_names = [c.name for c in existing_collections]
-
-    if collection_name not in collection_names:
-        print(f"Создание коллекции '{collection_name}'...")  # noqa T201
-        client.create_collection(
-            collection_name=collection_name,
-            vectors_config=VectorParams(
-                size=VECTOR_SIZE,
-                distance=Distance.COSINE
-            )
-        )
-        print(f"Коллекция '{collection_name}' создана.")  # noqa T201
-    else:
-        print(f"Коллекция '{collection_name}' уже существует.")  # noqa T201
-
+    if collection_name not in [c.name for c in client.get_collections().collections]:
+        client.create_collection(collection_name=collection_name,
+                                 vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE))
     return client
 
 
 def insert_points(client: QdrantClient, collection_name: str, points: list[PointStruct]):
-    """
-    Insert points into Qdrant collection.
-    """
-    client.upsert(
-        collection_name=collection_name,
-        points=points
-    )
+    client.upsert(collection_name=collection_name, points=points)
 
-
-# ===========================
-# Main ETL Process
-# ===========================
 
 def main():
-    # Загрузка модели
     model = load_model(MODEL_NAME)
-
-    # Подключение к Qdrant
     qdrant_client = connect_qdrant(QDRANT_HOST, QDRANT_PORT, QDRANT_COLLECTION_NAME)
-
-    # Получение списка txt файлов
     txt_files = get_txt_files(INPUT_FOLDER)
-    print(f"Найдено {len(txt_files)} текстовых файлов для обработки.")  # noqa T201
 
-    # Инициализация списка для пакетной вставки
     batch_points = []
-
-    # Итерация по каждому текстовому файлу с отображением прогресса
-    for file_path in tqdm(txt_files, desc="Обработка файлов"):
+    total_points = 0
+    for file_path in tqdm(txt_files, desc="Processing files"):
         try:
-            # Чтение содержимого файла
             text = read_file(file_path)
+            fragments = split_text(text)[:MAX_POINTS]
+            if fragments:
+                vectors = encode_texts(model, fragments)
+                points = prepare_points(fragments, vectors, file_path)
+                batch_points.extend(points)
+                total_points += len(points)
 
-            # Разбиение текста на фрагменты
-            fragments = split_text(text)
-
-            if not fragments:
-                continue
-
-            # Векторизация фрагментов
-            vectors = encode_texts(model, fragments)
-
-            # Подготовка точек для Qdrant
-            points = prepare_points(fragments, vectors, file_path)
-
-            # Добавление точек в батч
-            batch_points.extend(points)
-
-            # Вставка в Qdrant при достижении размера батча
-            if len(batch_points) >= BATCH_SIZE:
-                insert_points(qdrant_client, QDRANT_COLLECTION_NAME, batch_points)
-                batch_points = []
-
-        except Exception as e:  # noqa BLE001
-            print(f"Ошибка при обработке файла {file_path}: {e}")  # noqa T201
-
-    # Вставка оставшихся точек
+                if len(batch_points) >= BATCH_SIZE:
+                    insert_points(qdrant_client, QDRANT_COLLECTION_NAME, batch_points[:MAX_POINTS])
+                    batch_points = []
+    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            break   #БРЕЙК ДЛЯ ТОГО ЧТОБЫ ЗАГРУЗИТЬ НЕМНОЖКО
+    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        except Exception as e:
+            print(f"Error processing file {file_path}: {e}")
+    print("ETL process completed successfully.")
     if batch_points:
-        insert_points(qdrant_client, QDRANT_COLLECTION_NAME, batch_points)
+        insert_points(qdrant_client, QDRANT_COLLECTION_NAME, batch_points[:MAX_POINTS])
 
-    print("ETL процесс завершен успешно.")  # noqa T201
+    create_snapshot(qdrant_client, QDRANT_COLLECTION_NAME)
 
 
 if __name__ == "__main__":

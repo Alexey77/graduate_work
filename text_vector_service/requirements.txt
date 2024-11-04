@@ -5,3 +5,4 @@ loguru~=0.7.2
 pydantic-settings~=2.5.2
 sentence-transformers~=3.2.1
 qdrant-client[async]~=1.12.1
+grpcio-reflection==1.67.1

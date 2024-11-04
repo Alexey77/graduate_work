@@ -1,13 +1,10 @@
-import sys
+import logging
 
-from loguru import logger
-
-
-def setup_logger(name: str, **kwargs):
-    logger.remove()
-    logger.add(sys.stdout, colorize=True, format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {extra[name]} | {message}")
-    return logger.bind(name=name)
-
-
-def get_logger(name: str = "default") -> logger:
-    return setup_logger(name=name)
+def get_logger(name):
+    logger = logging.getLogger(name)
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
+    return logger

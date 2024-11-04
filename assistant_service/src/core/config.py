@@ -4,21 +4,21 @@ from typing import Annotated
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# class RabbitMQSettings(BaseSettings):
-#     USER: Annotated[str, Field(min_length=1)]
-#     PASSWORD: Annotated[str, Field(min_length=1)]
-#     HOST: Annotated[str, Field(min_length=1)]
-#     PORT: Annotated[int, Field(gt=1023, lt=65536)]
-#
-#     @property
-#     def uri(self) -> str:
-#         return f'amqp://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/'
-#
-#     model_config = SettingsConfigDict(
-#         env_prefix='RABBITMQ_',
-#         env_file='.env',
-#         extra='ignore',
-#         env_file_encoding='utf-8')
+class RabbitMQSettings(BaseSettings):
+    USER: Annotated[str, Field(min_length=1)]
+    PASSWORD: Annotated[str, Field(min_length=1)]
+    HOST: Annotated[str, Field(min_length=1)]
+    PORT: Annotated[int, Field(gt=1023, lt=65536)]
+
+    @property
+    def uri(self) -> str:
+        return f'amqp://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/'
+
+    model_config = SettingsConfigDict(
+        env_prefix='RABBITMQ_',
+        env_file='.env',
+        extra='ignore',
+        env_file_encoding='utf-8')
 
 
 class GrpcServiceSettings(BaseSettings):
