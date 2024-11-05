@@ -23,6 +23,3 @@ message FragmentResult {
 message SearchResponse {
   repeated FragmentResult similar_fragments = 1;
 }
-
-
-

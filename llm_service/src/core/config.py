@@ -24,7 +24,6 @@ class ProxySocks5(BaseSettings):
     PASSWORD: str | None = None
 
     def to_proxy_url(self) -> str:
-        """Create a SOCKS5 proxy URL."""
         if self.LOGIN and self.PASSWORD:
             return f"socks5://{self.LOGIN}:{self.PASSWORD}@{self.HOST}:{self.PORT}"
         return f"socks5://{self.HOST}:{self.PORT}"

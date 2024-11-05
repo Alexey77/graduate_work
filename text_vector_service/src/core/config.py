@@ -38,6 +38,7 @@ class EncoderSettings(BaseSettings):
         "distiluse-base-multilingual-cased-v2",
         "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
         "intfloat/multilingual-e5-large",
+        "intfloat/multilingual-e5-small"
     }
 
     model_config = SettingsConfigDict(

@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from api.v1 import healthy, rag
+from api.v1 import chat, healthy
 from core.config import settings
 from core.logger import get_logger
 from database.mongodb import AsyncMongoClient
@@ -27,7 +27,6 @@ async def lifespan(app: FastAPI):
 
         # app.state.db.close()
         await app.state.mongo.close()
-        await app.state.llm_service.disconnect()
         logger.info("Service stopped")
 
 
@@ -40,9 +39,7 @@ app = FastAPI(
 )
 
 
-
-app.include_router(rag.router, prefix='/api/v1/question', tags=['RAG'])
-# app.include_router(assistant.router, prefix='/api/v1/assistant', tags=['Assistant'])
+app.include_router(chat.router, prefix='/api/v1/chat', tags=['CHAT'])
 app.include_router(healthy.router, prefix='/api/v1/healthy', tags=['Health Check'])
 
 if __name__ == '__main__':
