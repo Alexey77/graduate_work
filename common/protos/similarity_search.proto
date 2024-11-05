@@ -6,11 +6,11 @@ service SimilaritySearchService  {
   rpc SearchSimilarFragments (SearchRequest) returns (SearchResponse);
 }
 
+
 message SearchRequest {
   string text = 1;
   string collection = 2;
   int32 limit = 3;
-  string model_name = 4; // Add this line to include model name
 }
 
 message FragmentResult {
@@ -18,6 +18,7 @@ message FragmentResult {
   string meta = 2;
   float score = 3;
 }
+
 
 message SearchResponse {
   repeated FragmentResult similar_fragments = 1;

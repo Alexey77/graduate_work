@@ -8,26 +8,22 @@ service EncoderService  {
   rpc SplitText(SplitTextRequest) returns (SplitTextResponse);
 }
 
-
 message EncodeRequest {
   string text = 1;
-  string model_name = 2;
 }
 
 message EncodeResponse {
   repeated float vector = 1;
-  string model_name = 2;  // Add model_name here
 }
 
 message CountTokensRequest {
   string text = 1;
-  string model_name = 2;
 }
 
 message CountTokensResponse {
   int32 token_count = 1;
-  string model_name = 2;  // Add model_name here
 }
+
 message SplitTextRequest {
   string text = 1;
   int32 chunk_size = 2;

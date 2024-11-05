@@ -4,6 +4,7 @@ from typing import Annotated
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class RabbitMQSettings(BaseSettings):
     USER: Annotated[str, Field(min_length=1)]
     PASSWORD: Annotated[str, Field(min_length=1)]

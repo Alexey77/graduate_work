@@ -11,9 +11,7 @@ root path \text_vector_service
 #### SimilaritySearchService
 `python -m grpc_tools.protoc -I../common/protos --python_out=./src/grpc_generated --grpc_python_out=./src/grpc_generated ../common/protos/similarity_search.proto`
 
-
 `docker build -t text_vector_service .`
-`docker build -t text_vector_service2 .`
 
 
 ### Lets run this
@@ -23,20 +21,17 @@ service
 qdrant
 `docker run -p 6333:6333 qdrant/qdrant`
 
-______________________
-!!!!!!!! не работает!!!!!!!!!!!!!
+test etl
+`венв, cd src, python _test_etl_qdrant.py`
+
+test client response
+`венв, cd src, python async_client.py`
+
+### TODO docker things
+
 ETL test script
 `docker run --env-file .env text_vector_service3 python3 src/_test_etl_qdrant.py`
 
-!!!!!! работает !!!!!!!!!!
-надо локально запускать
-`венв, cd src, python _test_etl_qdrant.py`
-
-### Клиент для теста сервиса
-!!!!!!!! не работает!!!!!!!!!!!!!
-`docker run --network text_vector_network --env-file .env service_client python3 src/async_client.py
+Async test client
+`docker run --env-file .env service_client python3 src/async_client.py
 `
-
-!!!!!! работает !!!!!!!!!!
-надо локально запускать
-`венв, cd src, python async_client.py`

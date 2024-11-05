@@ -1,32 +1,34 @@
-import json
-from datetime import datetime
 from itertools import count
 from pathlib import Path
 
 import torch
+from core.logger import get_logger
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, PointStruct, VectorParams
 from sentence_transformers import SentenceTransformer
 from tqdm import tqdm
 
+logger = get_logger(__name__)
 
-#______________Скачай репу себе в проект_____________
+# _____________TEST DATA_____________
 # https://github.com/JoannaBy/RussianNovels/tree/master
-INPUT_FOLDER = Path("/home/artem/Документы/graduate_work/RussianNovels/corpus")
+# INPUT_FOLDER = Path("/home/artem/Документы/graduate_work/RussianNovels/corpus")
 
-#______________Малая моделька_____________
+# _______________PROD DATA_____________
+INPUT_FOLDER = None
+# ______________Малая моделька_____________
 MODEL_NAME = "intfloat/multilingual-e5-small"
 VECTOR_SIZE = 384
 
-#______________Большая моделька_____________
+# ______________Большая моделька_____________
 # MODEL_NAME = "intfloat/multilingual-e5-large"
 # VECTOR_SIZE = 1024
 
-#______не в докере_______
+# ______не в докере_______
 QDRANT_HOST = "localhost"
 
-#_______в докере
+# _______в докере
 # QDRANT_HOST = "qdrant"
 
 
@@ -37,15 +39,11 @@ QDRANT_COLLECTION_NAME = "text_fragments"
 BATCH_SIZE = 1000
 MAX_POINTS = 100
 
-
-
 unique_id_counter = count(1)
 
-def create_snapshot(client: QdrantClient, collection_name: str):
-    snapshot_name = f"{collection_name}_snapshot_{datetime.now().strftime('%Y%m%d%H%M%S')}"
-    client.create_snapshot(collection_name=collection_name,)
-    print(f"Snapshot '{snapshot_name}' created successfully")
 
+def create_snapshot(client: QdrantClient, collection_name: str):
+    client.create_snapshot(collection_name=collection_name)
 
 
 def load_model(model_name: str) -> SentenceTransformer:
@@ -95,6 +93,7 @@ def main():
 
     batch_points = []
     total_points = 0
+
     for file_path in tqdm(txt_files, desc="Processing files"):
         try:
             text = read_file(file_path)
@@ -106,18 +105,17 @@ def main():
                 total_points += len(points)
 
                 if len(batch_points) >= BATCH_SIZE:
-                    insert_points(qdrant_client, QDRANT_COLLECTION_NAME, batch_points[:MAX_POINTS])
+                    insert_points(qdrant_client, QDRANT_COLLECTION_NAME, batch_points[:BATCH_SIZE])
                     batch_points = []
-    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            break   #БРЕЙК ДЛЯ ТОГО ЧТОБЫ ЗАГРУЗИТЬ НЕМНОЖКО
-    # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        except Exception as e:
-            print(f"Error processing file {file_path}: {e}")
-    print("ETL process completed successfully.")
-    if batch_points:
-        insert_points(qdrant_client, QDRANT_COLLECTION_NAME, batch_points[:MAX_POINTS])
+        except (OSError, ValueError, FileNotFoundError) as e:
+            logger.error(f"Error processing file {file_path}: {e}")
 
+    if batch_points:
+        insert_points(qdrant_client, QDRANT_COLLECTION_NAME, batch_points[:BATCH_SIZE])
+
+    logger.info(f"Processed a total of {total_points} points.")
     create_snapshot(qdrant_client, QDRANT_COLLECTION_NAME)
+    logger.info("ETL process completed successfully.")
 
 
 if __name__ == "__main__":

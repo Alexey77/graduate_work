@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17similarity_search.proto\x12\x11similarity_search\"T\n\rSearchRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x12\n\ncollection\x18\x02 \x01(\t\x12\r\n\x05limit\x18\x03 \x01(\x05\x12\x12\n\nmodel_name\x18\x04 \x01(\t\";\n\x0e\x46ragmentResult\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x0c\n\x04meta\x18\x02 \x01(\t\x12\r\n\x05score\x18\x03 \x01(\x02\"N\n\x0eSearchResponse\x12<\n\x11similar_fragments\x18\x01 \x03(\x0b\x32!.similarity_search.FragmentResult2x\n\x17SimilaritySearchService\x12]\n\x16SearchSimilarFragments\x12 .similarity_search.SearchRequest\x1a!.similarity_search.SearchResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17similarity_search.proto\x12\x11similarity_search\"@\n\rSearchRequest\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x12\n\ncollection\x18\x02 \x01(\t\x12\r\n\x05limit\x18\x03 \x01(\x05\";\n\x0e\x46ragmentResult\x12\x0c\n\x04text\x18\x01 \x01(\t\x12\x0c\n\x04meta\x18\x02 \x01(\t\x12\r\n\x05score\x18\x03 \x01(\x02\"N\n\x0eSearchResponse\x12<\n\x11similar_fragments\x18\x01 \x03(\x0b\x32!.similarity_search.FragmentResult2x\n\x17SimilaritySearchService\x12]\n\x16SearchSimilarFragments\x12 .similarity_search.SearchRequest\x1a!.similarity_search.SearchResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -32,11 +32,11 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'similarity_search_pb2', _gl
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
   _globals['_SEARCHREQUEST']._serialized_start=46
-  _globals['_SEARCHREQUEST']._serialized_end=130
-  _globals['_FRAGMENTRESULT']._serialized_start=132
-  _globals['_FRAGMENTRESULT']._serialized_end=191
-  _globals['_SEARCHRESPONSE']._serialized_start=193
-  _globals['_SEARCHRESPONSE']._serialized_end=271
-  _globals['_SIMILARITYSEARCHSERVICE']._serialized_start=273
-  _globals['_SIMILARITYSEARCHSERVICE']._serialized_end=393
+  _globals['_SEARCHREQUEST']._serialized_end=110
+  _globals['_FRAGMENTRESULT']._serialized_start=112
+  _globals['_FRAGMENTRESULT']._serialized_end=171
+  _globals['_SEARCHRESPONSE']._serialized_start=173
+  _globals['_SEARCHRESPONSE']._serialized_end=251
+  _globals['_SIMILARITYSEARCHSERVICE']._serialized_start=253
+  _globals['_SIMILARITYSEARCHSERVICE']._serialized_end=373
 # @@protoc_insertion_point(module_scope)
