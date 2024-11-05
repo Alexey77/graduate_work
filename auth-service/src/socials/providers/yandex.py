@@ -2,9 +2,8 @@ from urllib.parse import urlencode, urlsplit, urlunparse
 
 from networking.aiohttp import AiohttpNetworkClient
 from networking.httpx import NetworkException
-
-from ..exception import ProviderException
-from ..iprovider import IOAuthProvider
+from socials.exception import ProviderException
+from socials.iprovider import IOAuthProvider
 
 
 class YandexOAuthProvider(AiohttpNetworkClient, IOAuthProvider):
@@ -17,15 +16,22 @@ class YandexOAuthProvider(AiohttpNetworkClient, IOAuthProvider):
     def get_authorization_url(self) -> str:
         query_params = {
             "response_type": self.RESPONSE_TYPE,
-            "client_id": self._settings.CLIENT_ID
+            "client_id": self._settings.CLIENT_ID,
         }
         url_parts = urlsplit(self.AUTHORIZE_URL)
 
-        return urlunparse((url_parts.scheme, url_parts.netloc, url_parts.path, '',
-                           urlencode(query_params), ''))
+        return urlunparse(
+            (
+                url_parts.scheme,
+                url_parts.netloc,
+                url_parts.path,
+                "",
+                urlencode(query_params),
+                "",
+            )
+        )
 
     async def get_access_token(self, query_params: dict) -> str:
-
         try:
             data = {
                 "code": query_params[self.RESPONSE_TYPE],
@@ -36,10 +42,12 @@ class YandexOAuthProvider(AiohttpNetworkClient, IOAuthProvider):
         except KeyError as e:
             raise ProviderException(message=f"Missing required key: {e}")
 
-        headers_string = self.encode_base64(f"{self._settings.CLIENT_ID}:{self._settings.CLIENT_SECRET}")
+        headers_string = self.encode_base64(
+            f"{self._settings.CLIENT_ID}:{self._settings.CLIENT_SECRET}"
+        )
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
-            "Authorization": f"Basic {headers_string}"
+            "Authorization": f"Basic {headers_string}",
         }
         try:
             response = await self.post(url=self.TOKEN_URL, data=data, headers=headers)

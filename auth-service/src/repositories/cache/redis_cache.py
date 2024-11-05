@@ -14,12 +14,11 @@ class RedisConnectionError(Exception):
 
 
 class RedisRepositories(IAsyncCache):
-
     def __init__(self, settings: CacheSettings):
         self._settings = settings
-        self._client = Redis(host=self._settings.host,
-                             port=self._settings.port,
-                             decode_responses=True)
+        self._client = Redis(
+            host=self._settings.host, port=self._settings.port, decode_responses=True
+        )
 
     @property
     def client(self):

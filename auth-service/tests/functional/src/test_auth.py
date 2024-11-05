@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture
 def user_registration_data():
     return {
-        "login": "karimjon",
+        "email": "karimjon@mail.com",
         "password": "inshala",
         "first_name": "karim",
         "last_name": "jon"
@@ -16,7 +16,7 @@ def user_registration_data():
 @pytest.fixture
 def valid_user_credentials():
     return {
-        "login": "karimjon",
+        "email": "karimjon@mail.com",
         "password": "inshala"
     }
 
@@ -24,7 +24,7 @@ def valid_user_credentials():
 @pytest.fixture
 def invalid_password_credentials():
     return {
-        "login": "karimjon",
+        "email": "karimjon@mail.com",
         "password": "wrong_password"
     }
 
@@ -32,7 +32,7 @@ def invalid_password_credentials():
 @pytest.fixture
 def non_existent_user_credentials():
     return {
-        "login": "unknown_user",
+        "email": "unknown_user@mail.com",
         "password": "random_password"
     }
 
@@ -53,9 +53,10 @@ async def test_success_registration(make_post_http_request, user_registration_da
         endpoint='auth/register',
         params=user_registration_data,
     )
+    import pdb; pdb.set_trace()
     assert status == HTTPStatus.CREATED
 
-    login = user_registration_data["login"]
+    login = user_registration_data["email"]
     await clear_user_data(db_connection, login)
 
 
@@ -139,7 +140,7 @@ async def test_successful_history(make_get_http_request, make_post_http_request,
         "access-token": f"{valid_access_token}"
     }
     status, body = await make_get_http_request(
-        endpoint='auth/get_history',
+        endpoint='auth/history',
         headers=headers,
     )
     assert status == HTTPStatus.OK, "Успешный запрос должен вернуть статус 200"
@@ -164,7 +165,7 @@ async def test_invalid_token_history(make_get_http_request, make_post_http_reque
         "access-token": f"{invalid_access_token}"
     }
     status, body = await make_get_http_request(
-        endpoint='auth/get_history',
+        endpoint='auth/history',
         headers=headers,
     )
     assert status == HTTPStatus.UNAUTHORIZED, "Использование недействительного токена должно вернуть статус 401"
@@ -177,7 +178,7 @@ async def test_invalid_token_history(make_get_http_request, make_post_http_reque
 @pytest.mark.asyncio
 async def test_missing_token_history(make_get_http_request):
     status, body = await make_get_http_request(
-        endpoint='auth/get_history',
+        endpoint='auth/history',
     )
     assert status == HTTPStatus.UNAUTHORIZED, "Отсутствие токена должно вернуть статус 401"
 
@@ -324,16 +325,21 @@ async def test_unsuccesful_logout(make_post_http_request, user_registration_data
 
 
 @pytest.mark.asyncio
-async def test_missed_token_logout(make_post_http_request):
-    status, body = await make_post_http_request(
+async def test_missed_token_logout(make_delete_http_request):
+    status, body = await make_delete_http_request(
         endpoint='auth/logout',
     )
     assert status == HTTPStatus.UNAUTHORIZED, "Успешный запрос должен вернуть статус 200"
 
 
 @pytest.mark.asyncio
-async def test_succesful_logout_all(make_post_http_request, user_registration_data, db_connection,
-                                    valid_user_credentials):
+async def test_succesful_logout_all(
+    make_post_http_request,
+    make_delete_http_request,
+    user_registration_data,
+    db_connection,
+    valid_user_credentials
+):
     await make_post_http_request(
         endpoint='auth/register',
         params=user_registration_data,
@@ -348,7 +354,7 @@ async def test_succesful_logout_all(make_post_http_request, user_registration_da
     headers = {
         "access-token": f"{valid_access_token}"
     }
-    status, body = await make_post_http_request(
+    status, body = await make_delete_http_request(
         endpoint='auth/logout_all',
         headers=headers,
     )
@@ -359,17 +365,23 @@ async def test_succesful_logout_all(make_post_http_request, user_registration_da
 
 
 @pytest.mark.asyncio
-async def test_missed_token_logout_all(make_post_http_request):
-    status, body = await make_post_http_request(
+async def test_missed_token_logout_all(make_delete_http_request):
+    status, body = await make_delete_http_request(
         endpoint='auth/logout_all',
     )
     assert status == HTTPStatus.UNAUTHORIZED, "Успешный запрос должен вернуть статус 401"
 
 
 @pytest.mark.asyncio
-async def test_unsuccesful_logout_all_with_expired_token(redis_get, redis_del, make_post_http_request,
-                                                         user_expired_token_data, user_registration_data,
-                                                         db_connection):
+async def test_unsuccesful_logout_all_with_expired_token(
+    redis_get,
+    redis_del,
+    make_post_http_request,
+    make_delete_http_request,
+    user_expired_token_data,
+    user_registration_data,
+    db_connection
+):
     await make_post_http_request(
         endpoint='auth/register',
         params=user_registration_data,
@@ -379,7 +391,7 @@ async def test_unsuccesful_logout_all_with_expired_token(redis_get, redis_del, m
     headers = {
         "access-token": f"{expired_access_token}"
     }
-    status, body = await make_post_http_request(
+    status, body = await make_delete_http_request(
         endpoint='auth/logout_all',
         headers=headers,
     )
@@ -452,7 +464,7 @@ async def test_missing_token_validate(make_post_http_request):
 @pytest.fixture
 def user_pass_credentials():
     return {
-        "login": "karimjon",
+        "email": "karimjon@mail.com",
         "old_password": "inshala",
         "new_password": "salamolekyla",
     }

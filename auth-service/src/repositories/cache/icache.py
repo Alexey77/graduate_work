@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class IAsyncCache(ABC):
-
     @property
     @abstractmethod
     def client(self): ...

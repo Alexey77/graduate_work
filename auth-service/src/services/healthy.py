@@ -9,11 +9,11 @@ from repositories.database.idatabase import IAsyncDatabaseConnection
 
 
 class HealthCheckService:
-    def __init__(self,
-                 cache: IAsyncCache,
-                 db: IAsyncDatabaseConnection,
-
-                 ):
+    def __init__(
+        self,
+        cache: IAsyncCache,
+        db: IAsyncDatabaseConnection,
+    ):
         self._cache = HealthCheckRedis(cache)
         self._db = HealthCheckDB(connection=db)
 
@@ -24,9 +24,9 @@ class HealthCheckService:
         return await self._cache.check_cache()
 
 
-@lru_cache()
+@lru_cache
 def get_health_check_service(
-        cache: IAsyncCache = Depends(get_cache),
-        db: IAsyncDatabaseConnection = Depends(get_db_connection),
+    cache: IAsyncCache = Depends(get_cache),
+    db: IAsyncDatabaseConnection = Depends(get_db_connection),
 ) -> HealthCheckService:
     return HealthCheckService(cache, db)

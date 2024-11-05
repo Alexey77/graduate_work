@@ -14,8 +14,9 @@ class DatabaseConnection(IAsyncDatabaseConnection):
 
     async def get_engine(self):
         if self._engine is None:
-            self._engine = create_async_engine(self._settings.URI,
-                                               echo=self._settings.SQLALCHEMY_ECHO)
+            self._engine = create_async_engine(
+                self._settings.URI, echo=self._settings.SQLALCHEMY_ECHO
+            )
         return self._engine
 
     async def close(self):

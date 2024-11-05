@@ -363,7 +363,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/{{api_version}}/roles/{role_name}",
+					"raw": "{{base_url}}/{{api_version}}/roles/update",
 					"host": [
 						"{{base_url}}"
 					],
@@ -391,7 +391,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/{{api_version}}/roles/{role_name}/assign",
+					"raw": "{{base_url}}/{{api_version}}/roles/assign",
 					"host": [
 						"{{base_url}}"
 					],
@@ -420,7 +420,7 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}/{{api_version}}/roles/{role_name}/revoke",
+					"raw": "{{base_url}}/{{api_version}}/roles/revoke",
 					"host": [
 						"{{base_url}}"
 					],

@@ -9,4 +9,7 @@ def cache_factory(settings: CacheSettings, **kwargs) -> IAsyncCache:
     if settings.cache_storage == CacheStorageEnum.REDIS:
         return RedisRepositories(settings=cache_settings)
 
-    raise NotImplementedError(f"No implementation for {settings.cache_storage} in {__name__}.get_cache_storage")
+    error_msg = (
+        f"No implementation for {settings.cache_storage} in {__name__}.cache_factory"
+    )
+    raise NotImplementedError(error_msg)

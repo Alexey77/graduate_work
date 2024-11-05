@@ -5,7 +5,6 @@ from starlette.requests import Request
 
 
 class IProviderService(ABC):
-
     @abstractmethod
     def get_authorization_url(self, provider_name: str) -> str: ...
 

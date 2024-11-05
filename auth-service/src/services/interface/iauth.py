@@ -1,23 +1,36 @@
 from abc import ABC, abstractmethod
 
 from models.user_provider import UserProvider
-from schemas import (ResponseAuthTokens, ResponseUserHistory,
-                     ResponseUserPermissions, UserCredentials, UserPassUpdate,
-                     UserRegistration)
+from schemas import (
+    ResponseAuthTokens,
+    ResponseUserHistory,
+    ResponseUserPermissions,
+    UserCredentials,
+    UserPassUpdate,
+    UserRegistration,
+)
 
 
 class IAsyncAuthService(ABC):
     @abstractmethod
-    async def register(self, user: UserRegistration, user_agent: str, **kwargs) -> None: ...
+    async def register(
+        self, user: UserRegistration, user_agent: str, **kwargs
+    ) -> None: ...
 
     @abstractmethod
-    async def login(self, user: UserCredentials, user_agent: str, **kwargs) -> ResponseAuthTokens: ...
+    async def login(
+        self, user: UserCredentials, user_agent: str, **kwargs
+    ) -> ResponseAuthTokens: ...
 
     @abstractmethod
-    async def refresh_tokens(self, refresh_token: str, user_agent: str, **kwargs) -> ResponseAuthTokens: ...
+    async def refresh_tokens(
+        self, refresh_token: str, user_agent: str, **kwargs
+    ) -> ResponseAuthTokens: ...
 
     @abstractmethod
-    async def authorize_provider(self, user: UserProvider, user_agent: str, **kwargs) -> ResponseAuthTokens: ...
+    async def authorize_provider(
+        self, user: UserProvider, user_agent: str, **kwargs
+    ) -> ResponseAuthTokens: ...
 
     @abstractmethod
     async def validate_access_token(self, access_token: str, **kwargs) -> bool: ...

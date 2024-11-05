@@ -2,9 +2,8 @@ from urllib.parse import urlencode, urlsplit, urlunparse
 
 from networking.aiohttp import AiohttpNetworkClient
 from networking.httpx import NetworkException
-
-from ..exception import ProviderException
-from ..iprovider import IOAuthProvider
+from socials.exception import ProviderException
+from socials.iprovider import IOAuthProvider
 
 
 class GoogleOAuthProvider(AiohttpNetworkClient, IOAuthProvider):
@@ -22,27 +21,33 @@ class GoogleOAuthProvider(AiohttpNetworkClient, IOAuthProvider):
             "client_id": self._settings.CLIENT_ID,
             "scope": self.SCOPE,
             "access_type": "offline",
-            "prompt": "consent"
+            "prompt": "consent",
         }
         url_parts = urlsplit(self.AUTHORIZE_URL)
-        return urlunparse((url_parts.scheme, url_parts.netloc, url_parts.path, '', urlencode(query_params), ''))
+        return urlunparse(
+            (
+                url_parts.scheme,
+                url_parts.netloc,
+                url_parts.path,
+                "",
+                urlencode(query_params),
+                "",
+            )
+        )
 
     async def get_access_token(self, query_params: dict) -> str:
-
         try:
             data = {
                 "code": query_params[self.RESPONSE_TYPE],
                 "client_id": self._settings.CLIENT_ID,
                 "redirect_uri": self._settings.REDIRECT_URL,
                 "client_secret": self._settings.CLIENT_SECRET,
-                "grant_type": "authorization_code"
+                "grant_type": "authorization_code",
             }
         except KeyError as e:
             raise ProviderException(message=f"Missing required key: {e}")
 
-        headers = {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
         try:
             response = await self.post(url=self.TOKEN_URL, data=data, headers=headers)
             return response.get("access_token")

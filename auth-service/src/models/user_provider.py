@@ -8,7 +8,7 @@ from pydantic import BaseModel, EmailStr, constr
 
 def generate_random_password(length: int = 32) -> str:
     characters = string.ascii_letters + string.digits + string.punctuation
-    return ''.join(random.SystemRandom().choice(characters) for _ in range(length))
+    return "".join(random.SystemRandom().choice(characters) for _ in range(length))
 
 
 class UserProvider(BaseModel):
@@ -20,10 +20,10 @@ class UserProvider(BaseModel):
     @classmethod
     def from_yandex(cls, data: dict):
         return cls(
-            id_social=data['id'],
-            login=data['default_email'],
+            id_social=data["id"],
+            login=data["default_email"],
             password=generate_random_password(),
-            provider=Provider.YANDEX
+            provider=Provider.YANDEX,
         )
 
     @classmethod
@@ -32,7 +32,7 @@ class UserProvider(BaseModel):
             id_social=data["id"],
             login=data["email"],
             password=generate_random_password(),
-            provider=Provider.GOOGLE
+            provider=Provider.GOOGLE,
         )
 
     @classmethod
@@ -42,4 +42,5 @@ class UserProvider(BaseModel):
         elif provider_name == Provider.GOOGLE:
             return UserProvider.from_google(data=data)
         else:
-            raise ValueError(f"Unsupported provider: {provider_name}")
+            err_msg = f"Unsupported provider: {provider_name}"
+            raise ValueError(err_msg)

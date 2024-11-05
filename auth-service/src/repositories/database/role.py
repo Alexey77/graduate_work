@@ -1,6 +1,5 @@
 from models.entity import Role, User, UserRole
-from repositories.database.idatabase import (IAsyncDatabaseConnection,
-                                             IAsyncRoleDatabase)
+from repositories.database.idatabase import IAsyncDatabaseConnection, IAsyncRoleDatabase
 from schemas import Role as RoleSchemas
 from services.exception import RoleException
 from sqlalchemy import and_, select
@@ -9,7 +8,6 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 
 class RoleDatabase(IAsyncRoleDatabase):
-
     def __init__(self, db: IAsyncDatabaseConnection):
         self._db = db
 
@@ -38,11 +36,15 @@ class RoleDatabase(IAsyncRoleDatabase):
             role = await session.execute(select(Role).filter(Role.name == role_name))
             role = role.scalars().first()
             if role is None:
-                raise RoleException(f"Role with name '{role_name}' does not exist.")
+                raise RoleException(
+                    message=f"Role with name '{role_name}' does not exist."
+                )
             await session.delete(role)
             await session.commit()
 
-    async def get_roles(self, limit: int = None, offset: int = None) -> list[RoleSchemas]:
+    async def get_roles(
+        self, limit: int = None, offset: int = None
+    ) -> list[RoleSchemas]:
         async for session in self._get_session():
             query = select(Role)
             if offset is not None:
@@ -57,17 +59,17 @@ class RoleDatabase(IAsyncRoleDatabase):
             role_db = await session.execute(select(Role).where(Role.name == role_name))
             role_db = role_db.scalar()
             if role_db is None:
-                raise RoleException(f"The role {role_name} does not exist.")
+                raise RoleException(message=f"The role {role_name} does not exist.")
             return role_db
 
     async def update_role(self, role: RoleSchemas) -> Role:
         async for session in self._get_session():
-            role_db = await session.execute(
-                select(Role).where(Role.name == role.name)
-            )
+            role_db = await session.execute(select(Role).where(Role.name == role.name))
             role_db = role_db.scalar_one_or_none()
             if role_db is None:
-                raise RoleException(f"The role with the name {role.name} was not found in the database.")
+                raise RoleException(
+                    message=f"The role with the name {role.name} was not found in the database."
+                )
             role_db.description = role.description
             session.add(role_db)
             await session.commit()
@@ -87,15 +89,19 @@ class RoleDatabase(IAsyncRoleDatabase):
                 await session.commit()
             except IntegrityError:
                 await session.rollback()
-                raise RoleException("This role is already assigned to this user.")
+                raise RoleException(
+                    message="This role is already assigned to this user."
+                )
 
     async def remove_role_from_user(self, user: User, role: Role) -> None:
         async for session in self._get_session():
             user_role = await session.execute(
-                select(UserRole).where(and_(UserRole.user_id == user.id, UserRole.role_id == role.id))
+                select(UserRole).where(
+                    and_(UserRole.user_id == user.id, UserRole.role_id == role.id)
+                )
             )
             user_role = user_role.scalars().first()
             if user_role is None:
-                raise RoleException("This role is not assigned to this user.")
+                raise RoleException(message="This role is not assigned to this user.")
             await session.delete(user_role)
             await session.commit()

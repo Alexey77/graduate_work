@@ -1,15 +1,13 @@
 from abc import ABC, abstractmethod
-from typing import Sequence
+from collections.abc import Sequence
 from uuid import UUID
 
-from models.entity import Permission, ProviderAccount
+from models.entity import Permission, ProviderAccount, User
 from models.entity import Role as RoleDB
-from models.entity import User
 from schemas import ResponseUserHistory, Role
 
 
 class IAsyncDatabaseConnection(ABC):
-
     @abstractmethod
     async def get_engine(self): ...
 
@@ -18,7 +16,6 @@ class IAsyncDatabaseConnection(ABC):
 
 
 class IAsyncUserDatabase(ABC):
-
     @abstractmethod
     def __init__(self, db: IAsyncDatabaseConnection): ...
 
@@ -32,7 +29,9 @@ class IAsyncUserDatabase(ABC):
     async def get_user_by_refresh_token(self, refresh_token: str) -> User | None: ...
 
     @abstractmethod
-    async def get_user_with_provider_accounts(self, login: str) -> tuple[User | None, list[ProviderAccount]]: ...
+    async def get_user_with_provider_accounts(
+        self, login: str
+    ) -> tuple[User | None, list[ProviderAccount]]: ...
 
     @abstractmethod
     async def get_user_roles_by_id(self, user_id: UUID) -> Sequence[Role]: ...
@@ -48,7 +47,6 @@ class IAsyncUserDatabase(ABC):
 
 
 class IAsyncRoleDatabase(ABC):
-
     @abstractmethod
     def __init__(self, db: IAsyncDatabaseConnection): ...
 
@@ -78,12 +76,13 @@ class IAsyncRoleDatabase(ABC):
 
 
 class IAsyncSessionDatabase(ABC):
-
     @abstractmethod
     def __init__(self, db: IAsyncDatabaseConnection): ...
 
     @abstractmethod
-    async def add_user_session(self, user_id: UUID, refresh_token: str, **kwargs) -> bool: ...
+    async def add_user_session(
+        self, user_id: UUID, refresh_token: str, **kwargs
+    ) -> bool: ...
 
     @abstractmethod
     async def delete_session(self, refresh_token: str) -> None: ...
@@ -92,7 +91,9 @@ class IAsyncSessionDatabase(ABC):
     async def delete_all_sessions_by_user_id(self, user_id: UUID) -> int: ...
 
     @abstractmethod
-    async def get_user_sessions_by_user_id(self, user_id: UUID) -> ResponseUserHistory: ...
+    async def get_user_sessions_by_user_id(
+        self, user_id: UUID
+    ) -> ResponseUserHistory: ...
 
 
 class IProviderDatabase(ABC):
@@ -100,7 +101,11 @@ class IProviderDatabase(ABC):
     def __init__(self, db: IAsyncDatabaseConnection): ...
 
     @abstractmethod
-    async def add_provider_account(self, provider_account: ProviderAccount) -> ProviderAccount: ...
+    async def add_provider_account(
+        self, provider_account: ProviderAccount
+    ) -> ProviderAccount: ...
 
     @abstractmethod
-    async def get_provider_account_by_login(self, login: str, provider_name: str) -> ProviderAccount | None: ...
+    async def get_provider_account_by_login(
+        self, login: str, provider_name: str
+    ) -> ProviderAccount | None: ...

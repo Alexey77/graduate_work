@@ -1,10 +1,15 @@
-from typing import Sequence
+from collections.abc import Sequence
 from uuid import UUID
 
-from models.entity import (Permission, ProviderAccount, Role, User, UserRole,
-                           UserSessions)
-from repositories.database.idatabase import (IAsyncDatabaseConnection,
-                                             IAsyncUserDatabase)
+from models.entity import (
+    Permission,
+    ProviderAccount,
+    Role,
+    User,
+    UserRole,
+    UserSessions,
+)
+from repositories.database.idatabase import IAsyncDatabaseConnection, IAsyncUserDatabase
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import async_sessionmaker
@@ -14,7 +19,6 @@ from .exception import DBException
 
 
 class UserDatabase(IAsyncUserDatabase):
-
     def __init__(self, db: IAsyncDatabaseConnection):
         self._db = db
 
@@ -63,9 +67,15 @@ class UserDatabase(IAsyncUserDatabase):
             return user
         return None
 
-    async def get_user_by_refresh_token(self, refresh_token: str, is_active: bool = False) -> User | None:
+    async def get_user_by_refresh_token(
+        self, refresh_token: str, is_active: bool = False
+    ) -> User | None:
         async for session in self._get_session():
-            query = select(User).join(UserSessions).where(UserSessions.refresh_token == refresh_token)
+            query = (
+                select(User)
+                .join(UserSessions)
+                .where(UserSessions.refresh_token == refresh_token)
+            )
             if is_active:
                 query = query.where(UserSessions.is_active)
             result = await session.execute(query)
@@ -77,7 +87,9 @@ class UserDatabase(IAsyncUserDatabase):
             result = await session.execute(query)
             return result.scalars().first()
 
-    async def get_user_with_provider_accounts(self, login: str) -> tuple[User | None, list[ProviderAccount]]:
+    async def get_user_with_provider_accounts(
+        self, login: str
+    ) -> tuple[User | None, list[ProviderAccount]]:
         async for session in self._get_session():
             query = (
                 select(User)
@@ -102,18 +114,24 @@ class UserDatabase(IAsyncUserDatabase):
             result = await session.execute(query)
             user = result.scalars().first()
             if user:
-                for key in User.__table__.columns.keys():
+                for key in User.__table__.columns.keys():  # noqa
                     if key in kwargs:
-                        new_value = User.hash_password(kwargs[key]) if key == 'password' else kwargs[key]
+                        new_value = (
+                            User.hash_password(kwargs[key])
+                            if key == "password"
+                            else kwargs[key]
+                        )
                         setattr(user, key, new_value)
                 session.add(user)
                 await session.commit()
 
     async def get_user_permissions(self, login: str) -> Sequence[Permission]:
         async for session in self._get_session():
-            query = select(Permission.name) \
-                .join(Role, Permission.roles) \
-                .join(User, Role.users) \
+            query = (
+                select(Permission.name)
+                .join(Role, Permission.roles)
+                .join(User, Role.users)
                 .where(User.login == login)
+            )
             result = await session.execute(query)
             return result.scalars().all()

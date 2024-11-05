@@ -17,15 +17,15 @@ class ProviderSettings(BaseSettings):
 
 class YandexProviderSettings(ProviderSettings):
     class Config:
-        extra = 'ignore'
-        env_file = './auth-service/.env'
-        env_file_encoding = 'utf-8'
-        env_prefix = 'YANDEX_'
+        extra = "ignore"
+        env_file = "./auth-service/.env"
+        env_file_encoding = "utf-8"
+        env_prefix = "YANDEX_"
 
 
 class GoogleProviderSettings(ProviderSettings):
     class Config:
-        extra = 'ignore'
-        env_file = './auth-service/.env'
-        env_file_encoding = 'utf-8'
-        env_prefix = 'GOOGLE_'
+        extra = "ignore"
+        env_file = "./auth-service/.env"
+        env_file_encoding = "utf-8"
+        env_prefix = "GOOGLE_"

@@ -2,14 +2,16 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, constr
 
-jwt_token = Field(pattern=r'^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$', min_length=16)
+jwt_token = Field(
+    pattern=r"^[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+\.[A-Za-z0-9\-_]+$", min_length=16
+)
 
 
 class ResponseAuthTokens(BaseModel):
     access_token: str = jwt_token
     refresh_token: str = jwt_token
 
-    model_config = ConfigDict(regex_engine='python-re')
+    model_config = ConfigDict(regex_engine="python-re")
 
 
 class ResponseMessage(BaseModel):
@@ -26,13 +28,13 @@ class ResponseUserHistory(BaseModel):
 
 
 class UserPassUpdate(BaseModel):
-    login: EmailStr = Field(..., alias='email')
+    login: EmailStr = Field(..., alias="email")
     old_password: constr(min_length=1)
     new_password: constr(min_length=1)
 
 
 class UserCredentials(BaseModel):
-    login: EmailStr = Field(..., alias='email')
+    login: EmailStr = Field(..., alias="email")
     password: constr(min_length=1)
 
 

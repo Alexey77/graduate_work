@@ -16,10 +16,7 @@ logger = get_logger(__name__)
 
 
 class RolesService(IAsyncRoles):
-    def __init__(self,
-                 db: IAsyncRoleDatabase,
-                 access_service: IAsyncAccessService
-                 ):
+    def __init__(self, db: IAsyncRoleDatabase, access_service: IAsyncAccessService):
         self._db = db
         self._access_service = access_service
 
@@ -30,7 +27,9 @@ class RolesService(IAsyncRoles):
             raise RoleException(message=e.message)
         return await self._db.create_role(role=role)
 
-    async def get_roles(self, limit: int | None = None, offset: int | None = None) -> list[Role]:
+    async def get_roles(
+        self, limit: int | None = None, offset: int | None = None
+    ) -> list[Role]:
         return await self._db.get_roles(limit=limit, offset=offset)
 
     async def delete_role_by_name(self, role_name: str, access_token: str) -> None:
@@ -55,7 +54,9 @@ class RolesService(IAsyncRoles):
         role_db: RoleDB = await self._db.get_role_by_name(role_name=role_name)
         return Role(name=role_db.name, description=role_db.description)
 
-    async def _handle_role_assignment(self, user_name: str, role_name: str, access_token: str) -> tuple[RoleDB, User]:
+    async def _handle_role_assignment(
+        self, user_name: str, role_name: str, access_token: str
+    ) -> tuple[RoleDB, User]:
         try:
             await self._access_service.verify_admin_access(access_token=access_token)
         except AccessException as e:
@@ -69,24 +70,26 @@ class RolesService(IAsyncRoles):
             raise RoleException(message=msg)
         return role_db, user_db
 
-    async def assign_role_to_user(self, user_name: str, role_name: str, access_token: str) -> None:
-        role_db, user_db = await self._handle_role_assignment(user_name=user_name,
-                                                              role_name=role_name,
-                                                              access_token=access_token)
+    async def assign_role_to_user(
+        self, user_name: str, role_name: str, access_token: str
+    ) -> None:
+        role_db, user_db = await self._handle_role_assignment(
+            user_name=user_name, role_name=role_name, access_token=access_token
+        )
         await self._db.assign_role_to_user(user=user_db, role=role_db)
 
-    async def revoke_role_from_user(self, user_name: str, role_name: str, access_token: str) -> None:
-        role_db, user_db = await self._handle_role_assignment(user_name=user_name,
-                                                              role_name=role_name,
-                                                              access_token=access_token)
+    async def revoke_role_from_user(
+        self, user_name: str, role_name: str, access_token: str
+    ) -> None:
+        role_db, user_db = await self._handle_role_assignment(
+            user_name=user_name, role_name=role_name, access_token=access_token
+        )
         await self._db.remove_role_from_user(user=user_db, role=role_db)
 
 
-@lru_cache()
+@lru_cache
 def get_role_service(
-        db: IAsyncRoleDatabase = Depends(get_role_db),
-        access_service: IAsyncAccessService = Depends(get_access_service)
+    db: IAsyncRoleDatabase = Depends(get_role_db),
+    access_service: IAsyncAccessService = Depends(get_access_service),
 ) -> IAsyncRoles:
-    return RolesService(
-        db,
-        access_service)
+    return RolesService(db, access_service)

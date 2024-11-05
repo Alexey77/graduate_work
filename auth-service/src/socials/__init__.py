@@ -1,5 +1,4 @@
-from core.provider import (GoogleProviderSettings, Provider,
-                           YandexProviderSettings)
+from core.provider import GoogleProviderSettings, Provider, YandexProviderSettings
 from socials.exception import ProviderException
 from socials.iprovider import IOAuthProvider
 from socials.providers import GoogleOAuthProvider, YandexOAuthProvider

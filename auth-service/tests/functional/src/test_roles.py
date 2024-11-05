@@ -25,12 +25,15 @@ def role_data3():
         "name": "bruce3",
         "description": "vsemogushiy3",
     }
+
+
 @pytest.fixture
 def admin_creds():
     return {
         "login": "admin",
         "password": "1234",
     }
+
 
 @pytest.fixture
 def create_role(make_post_http_request, db_connection, admin_creds):
@@ -45,7 +48,7 @@ def create_role(make_post_http_request, db_connection, admin_creds):
             "access-token": f"{access_token}"
         }
         status, body = await make_post_http_request(
-            endpoint='roles/create',
+            endpoint='roles',
             params=role_data,
             headers=headers
         )
@@ -66,12 +69,14 @@ def cleanup_role(db_connection):
 
     return _cleanup_role
 
+
 @pytest.mark.asyncio
 async def test_succesful_role_creation(create_role, cleanup_role, role_data):
     role = await create_role(role_data)
     role_id = role["id"]
     assert role["name"] == role_data["name"]
     await cleanup_role(role_id)
+
 
 @pytest.fixture
 async def login_as_admin(make_post_http_request, admin_creds):
@@ -83,6 +88,8 @@ async def login_as_admin(make_post_http_request, admin_creds):
     access_token = body['access_token']
 
     return access_token
+
+
 @pytest.mark.asyncio
 async def test_role_creation_conflict(make_post_http_request, create_role, cleanup_role, role_data, admin_creds, login_as_admin):
     role = await create_role(role_data)
@@ -93,7 +100,7 @@ async def test_role_creation_conflict(make_post_http_request, create_role, clean
         "access-token": f"{access_token}"
     }
     status, body = await make_post_http_request(
-        endpoint='roles/create',
+        endpoint='roles',
         params=role_data,
         headers=headers
     )
@@ -108,7 +115,7 @@ async def test_read_roles(make_get_http_request, create_role, cleanup_role, role
     role2 = await create_role(role_data2)
     role3 = await create_role(role_data3)
 
-    status, body = await make_get_http_request(endpoint='roles/read/')
+    status, body = await make_get_http_request(endpoint='roles/')
     assert status == HTTPStatus.OK, "Expected HTTP 200 OK"
     assert len(body) == 5, "Expected three roles in response, 3 created 2 admin and guest"
 
@@ -122,7 +129,7 @@ async def test_read_role(make_get_http_request, create_role, cleanup_role, role_
     role = await create_role(role_data)
     role_id = role["id"]
 
-    status, body = await make_get_http_request(endpoint=f'roles/read/{role_data["name"]}')
+    status, body = await make_get_http_request(endpoint=f'roles/{role_data["name"]}')
     assert status == HTTPStatus.OK, "Expected HTTP 200 OK"
 
     await cleanup_role(role_id)
@@ -165,16 +172,19 @@ async def test_read_role_404(make_get_http_request, create_role, cleanup_role, r
     role = await create_role(role_data)
     role_id = role["id"]
 
-    status, body = await make_get_http_request(endpoint='roles/read/fake_role')
+    status, body = await make_get_http_request(endpoint='roles/fake_role')
     assert status == HTTPStatus.NOT_FOUND, "Expected HTTP 404 NOT FOUND"
 
     await cleanup_role(role_id)
+
+
 @pytest.fixture
 def assign_role():
     return {
         "user_name": "admin",
         "role_name": "bruce",
     }
+
 
 @pytest.mark.asyncio
 async def test_assign_role(make_post_http_request, create_role, role_data, admin_creds, login_as_admin, assign_role):
@@ -185,11 +195,12 @@ async def test_assign_role(make_post_http_request, create_role, role_data, admin
         "access-token": f"{access_token}"
     }
     status, body = await make_post_http_request(
-        endpoint='roles/assign-role',
+        endpoint='roles/assign',
         params=assign_role,
         headers=headers
     )
     assert status == HTTPStatus.OK, "Expected HTTP 200 OK"
+
 
 @pytest.mark.asyncio
 async def test_revoke_role(make_post_http_request, role_data, admin_creds, login_as_admin, assign_role):
@@ -199,7 +210,7 @@ async def test_revoke_role(make_post_http_request, role_data, admin_creds, login
         "access-token": f"{access_token}"
     }
     status, body = await make_post_http_request(
-        endpoint='roles/revoke-role',
+        endpoint='roles/revoke',
         params=assign_role,
         headers=headers
     )

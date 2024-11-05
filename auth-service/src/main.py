@@ -2,8 +2,13 @@ from contextlib import asynccontextmanager
 
 import uvicorn
 from api.v1 import auth, healthy, roles
-from core.config import (JWTSettings, cache_settings, db_settings, settings,
-                         trace_settings)
+from core.config import (
+    JWTSettings,
+    cache_settings,
+    db_settings,
+    settings,
+    trace_settings,
+)
 from fastapi import FastAPI, Request, status
 from fastapi.responses import ORJSONResponse
 from jwt_manager import jwt_manager_factory
@@ -29,52 +34,56 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    docs_url='/api/openapi',
-    openapi_url='/api/openapi.json',
+    docs_url="/api/openapi",
+    openapi_url="/api/openapi.json",
     default_response_class=ORJSONResponse,
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 if trace_settings.USE_TRACE:
     configure_tracer()
     FastAPIInstrumentor.instrument_app(app)
 
-app.include_router(auth.router, prefix='/api/v1/auth', tags=['Authorization'])
-app.include_router(roles.router, prefix='/api/v1/roles', tags=['Roles'])
-app.include_router(healthy.router, prefix='/api/v1/healthy', tags=['Health Check'])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authorization"])
+app.include_router(roles.router, prefix="/api/v1/roles", tags=["Roles"])
+app.include_router(healthy.router, prefix="/api/v1/healthy", tags=["Health Check"])
 
 
 @app.middleware("http")
 async def check_request_id(request: Request, call_next):
-    request_id = request.headers.get('X-Request-Id')
+    request_id = request.headers.get("X-Request-Id")
     if not request_id:
-        return ORJSONResponse(status_code=status.HTTP_400_BAD_REQUEST,
-                              content={'detail': 'X-Request-Id is required'})
+        return ORJSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"detail": "X-Request-Id is required"},
+        )
     response = await call_next(request)
     return response
 
 
 @app.middleware("http")
 async def rate_limit(request: Request, call_next):
-    if request.headers.get('X-Request-Id') == 'healthcheck':  # docker healthcheck
+    if request.headers.get("X-Request-Id") == "healthcheck":  # docker healthcheck
         return await call_next(request)
 
     cache_client = app.state.cache.client
     track_request = get_track_request(client=cache_client)
 
-    user_id = request.headers.get('X-Forwarded-For')
+    user_id = request.headers.get("X-Forwarded-For")
     request_number = await track_request(user_id=user_id, client=cache_client)
     if request_number > settings.REQUEST_LIMIT_PER_MINUTE:
-        return ORJSONResponse(status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-                              content={'detail': 'Too many requests'})
+        return ORJSONResponse(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            content={"detail": "Too many requests"},
+        )
 
     response = await call_next(request)
     return response
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     uvicorn.run(
-        'main:app',
+        "main:app",
         host=settings.HOST,
         port=settings.PORT,
     )
