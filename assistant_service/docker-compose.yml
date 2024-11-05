@@ -12,6 +12,8 @@ services:
       - rabbitmq
       - mongo
     env_file: .env
+    networks:
+      - common-net
     healthcheck:
       test: ["CMD-SHELL", "curl -I http://localhost:8000/api/v1/healthy/live|| exit 1"]
       interval: 10s
@@ -24,6 +26,8 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    networks:
+      - common-net
     environment:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
@@ -38,6 +42,8 @@ services:
         MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
       ports:
         - "27017:27017"
+      networks:
+        - common-net
 #      volumes:
 #        - mongo-data:/data/db
 
@@ -49,3 +55,7 @@ volumes:
       type: none
       o: bind
       device: ${MONGODB_VOLUME_PATH}
+
+networks:
+  common-net:
+    name: cinema_network

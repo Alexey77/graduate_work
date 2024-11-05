@@ -22,9 +22,23 @@ class RabbitMQSettings(BaseSettings):
         env_file_encoding='utf-8')
 
 
+class AuthServiceSettings(BaseSettings):
+    url: Annotated[str, Field(min_length=1)]
+    secret_key: Annotated[str, Field(min_length=1)]
+    algorithm: Annotated[str, Field(default="HS256", min_length=1)]
+
+    model_config = SettingsConfigDict(
+        env_prefix='AUTH_SERVICE_',
+        env_file='.env',
+        extra='ignore',
+        env_file_encoding='utf-8'
+    )
+
+
 class GrpcServiceSettings(BaseSettings):
     HOST: Annotated[str, Field(min_length=1)]
     PORT: Annotated[int, Field(gt=1023, lt=65536)]
+
 
 class LLMService(GrpcServiceSettings):
 
@@ -34,7 +48,6 @@ class LLMService(GrpcServiceSettings):
         extra='ignore',
         env_file_encoding='utf-8'
     )
-
 
 
 class MongoDBSettings(BaseSettings):
@@ -76,3 +89,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+auth_service_settings = AuthServiceSettings()

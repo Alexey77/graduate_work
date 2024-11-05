@@ -1,0 +1,508 @@
+{
+	"info": {
+		"_postman_id": "d5550d91-ea44-4f9e-b672-912a53473cbe",
+		"name": "Auth Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "31846038"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"anja.dvr@gmail.com\",\n    \"password\": \"1234qwerty\",\n    \"first_name\": \"Anna\",\n    \"last_name\": \"Dvoretskaya\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/register",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"const response = pm.response.json();",
+							"pm.collectionVariables.set(\"auth_token\", response.access_token);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "test",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"anja.dvr@gmail.com\",\n    \"password\": \"1234qwerty\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/login",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/logout",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout All",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/logout_all",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"logout_all"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login history",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/history",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"history"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Password change",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"email\": \"anja.dvr@gmail.com\",\n    \"old_password\": \"12345qwerty\",\n    \"new_password\": \"1234qwerty\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/password_change",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"password_change"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Social Authorize",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/authorize/{provider}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"authorize",
+						"{provider}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Social login",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/login/{provider}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"login",
+						"{provider}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "refresh-token",
+						"value": "{{refresh_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/auth/token/refresh",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"auth",
+						"token",
+						"refresh"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get permissions",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Validate token",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "List Roles",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/roles",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"roles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Role",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"user\",\n    \"description\": \"Basic user role\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/roles",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"roles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Details Role",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/roles/{role_name}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"roles",
+						"{role_name}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Role",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/roles/{role_name}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"roles",
+						"{role_name}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Role",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"another_name\",\n    \"description\": \"description\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/roles/update",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"roles",
+						"{role_name}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Assign Role",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_name\": \"anja.dvr@gmail.com\",\n    \"role_name\": \"guest\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/roles/assign",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"roles",
+						"{role_name}",
+						"assign"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Revoke Role",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_name\": \"anja.dvr@gmail.com\",\n    \"role_name\": \"guest\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/{{api_version}}/roles/revoke",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"{{api_version}}",
+						"roles",
+						"{role_name}",
+						"revoke"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{auth_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"// pm.request.headers.add({",
+					"//     key: 'X-Request-Id',",
+					"//     value: pm.variables.replaceIn(\"{{$uuid}}\")",
+					"// });",
+					"",
+					"",
+					"const uuid = () => {",
+					"    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {",
+					"        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);",
+					"        return v.toString(16);",
+					"    });",
+					"};",
+					"",
+					"pm.request.headers.add({",
+					"    key: 'X-Request-Id',",
+					"    value: uuid()",
+					"});"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8001/api",
+			"type": "string"
+		},
+		{
+			"key": "api_version",
+			"value": "v1",
+			"type": "string"
+		},
+		{
+			"key": "auth_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
