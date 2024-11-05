@@ -27,14 +27,14 @@ class RAGService:
         )
         messages = [
             {"role": "system", "content": intent_prompt},
-            {"role": "user", "content": user_query}
+            {"role": "user", "content": user_query},
         ]
         response = await self._llm.get_completion(
             service=3,
             model="gpt-4o-mini",
             system=intent_prompt,
             max_tokens=10,
-            messages=json.dumps(messages, ensure_ascii=False)
+            messages=json.dumps(messages, ensure_ascii=False),
         )
 
         intent = response.reply.strip().lower()
@@ -46,7 +46,7 @@ class RAGService:
             "get_movie_reviews",
             "get_personal_recommendations",
             "report_technical_issue",
-            "handle_general_inquiry"
+            "handle_general_inquiry",
         }
 
         if intent not in valid_intents:
@@ -54,27 +54,94 @@ class RAGService:
 
         if intent == "handle_general_inquiry":
             lower_query = user_query.lower()
-            if any(keyword in lower_query for keyword in
-                   ["кто он", "фильм", "снимался", "актёр", "актриса", "фильмы", "режиссёр", "персона"]):
+            if any(
+                keyword in lower_query
+                for keyword in [
+                    "кто он",
+                    "фильм",
+                    "снимался",
+                    "актёр",
+                    "актриса",
+                    "фильмы",
+                    "режиссёр",
+                    "персона",
+                ]
+            ):
                 intent = "get_info_about_person_or_movie"
-            elif any(keyword in lower_query for keyword in
-                     ["подписка", "условия", "тариф", "стоимость", "доступ", "доступен", "сеанс", "расписание",
-                      "в прокате"]):
+            elif any(
+                keyword in lower_query
+                for keyword in [
+                    "подписка",
+                    "условия",
+                    "тариф",
+                    "стоимость",
+                    "доступ",
+                    "доступен",
+                    "сеанс",
+                    "расписание",
+                    "в прокате",
+                ]
+            ):
                 intent = "get_cinema_info"
-            elif any(keyword in lower_query for keyword in
-                     ["подписаться", "оформить подписку", "отписаться", "отмена подписки", "оплата", "счёт", "платёж",
-                      "продлить", "активировать"]):
+            elif any(
+                keyword in lower_query
+                for keyword in [
+                    "подписаться",
+                    "оформить подписку",
+                    "отписаться",
+                    "отмена подписки",
+                    "оплата",
+                    "счёт",
+                    "платёж",
+                    "продлить",
+                    "активировать",
+                ]
+            ):
                 intent = "handle_subscription_request"
-            elif any(keyword in lower_query for keyword in
-                     ["отзывы", "мнение", "рейтинг", "оценка", "как фильм", "обзор"]):
+            elif any(
+                keyword in lower_query
+                for keyword in [
+                    "отзывы",
+                    "мнение",
+                    "рейтинг",
+                    "оценка",
+                    "как фильм",
+                    "обзор",
+                ]
+            ):
                 intent = "get_movie_reviews"
-            elif any(keyword in lower_query for keyword in
-                     ["рекомендации", "посоветуй", "посоветовать", "что посмотреть", "совет", "под настроение",
-                      "на выходные", "лучшие фильмы", "для семьи"]):
+            elif any(
+                keyword in lower_query
+                for keyword in [
+                    "рекомендации",
+                    "посоветуй",
+                    "посоветовать",
+                    "что посмотреть",
+                    "совет",
+                    "под настроение",
+                    "на выходные",
+                    "лучшие фильмы",
+                    "для семьи",
+                ]
+            ):
                 intent = "get_personal_recommendations"
-            elif any(keyword in lower_query for keyword in
-                     ["проблема", "не работает", "ошибка", "сбой", "техническая поддержка", "не загружается",
-                      "проблемы с доступом", "вход", "аккаунт", "зависает", "не воспроизводится", "звука нет"]):
+            elif any(
+                keyword in lower_query
+                for keyword in [
+                    "проблема",
+                    "не работает",
+                    "ошибка",
+                    "сбой",
+                    "техническая поддержка",
+                    "не загружается",
+                    "проблемы с доступом",
+                    "вход",
+                    "аккаунт",
+                    "зависает",
+                    "не воспроизводится",
+                    "звука нет",
+                ]
+            ):
                 intent = "report_technical_issue"
 
         return intent
@@ -85,7 +152,9 @@ class RAGService:
     async def get_cinema_info(self, query: str) -> dict[str, Any]:
         return {"info": "условия подписки или доступность фильма"}
 
-    async def handle_subscription_request(self, action: str, user_id: int) -> dict[str, Any]:
+    async def handle_subscription_request(
+        self, action: str, user_id: int
+    ) -> dict[str, Any]:
         return {"status": f"Subscription {action}", "user_id": user_id}
 
     async def get_movie_reviews(self, movie_title: str) -> dict[str, Any]:
@@ -108,7 +177,7 @@ class RAGService:
             "user_id": 123,
             "movie_title": "Some Movie",
             "preferences": "comedy",
-            "issue_description": "Issue description here"
+            "issue_description": "Issue description here",
         }
 
         intent_function_mapping = {
@@ -141,25 +210,32 @@ class RAGService:
         similar_fragments = await self._llm.get_similar_fragments(user_query)
 
         enriched_context = "\n".join(
-            [f"{frag['text']} (relevance score: {frag['score']})" for frag in similar_fragments])
+            [
+                f"{frag['text']} (relevance score: {frag['score']})"
+                for frag in similar_fragments
+            ]
+        )
         logger.info("Enriched context generated for query.")
 
         return enriched_context
 
-    async def get_answer(self, messages: dict, system_prompt: str) -> ReplyResponseModel:
-
+    async def get_answer(
+        self, messages: dict, system_prompt: str
+    ) -> ReplyResponseModel:
         response = await self._llm.get_completion(
             service=3,
             model="gpt-4o-mini",
             system=system_prompt,
             max_tokens=150,
-            messages=json.dumps([messages], ensure_ascii=False)
+            messages=json.dumps([messages], ensure_ascii=False),
         )
 
-        return ReplyResponseModel(messages=[
-            messages,
-            {"role": Role.assistant.value, "content": response.reply}
-        ])
+        return ReplyResponseModel(
+            messages=[
+                messages,
+                {"role": Role.assistant.value, "content": response.reply},
+            ]
+        )
 
 
 @lru_cache

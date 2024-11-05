@@ -4,9 +4,10 @@ from functools import lru_cache
 
 
 class HealthCheckService:
-    def __init__(self,
-                 # db
-                 ) -> None:
+    def __init__(
+        self,
+        # db
+    ) -> None:
         pass
         # self._db = db
 
@@ -16,7 +17,7 @@ class HealthCheckService:
 
 @lru_cache
 def get_health_check_service(
-        # db=Depends(get_db)
+    # db=Depends(get_db)
 ) -> HealthCheckService:
     return HealthCheckService(
         # db
