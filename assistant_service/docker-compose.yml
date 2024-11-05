@@ -44,8 +44,8 @@ services:
         - "27017:27017"
       networks:
         - common-net
-      volumes:
-        - mongo-data:/data/db
+#      volumes:
+#        - mongo-data:/data/db
 
 volumes:
   rabbitmq-data:
