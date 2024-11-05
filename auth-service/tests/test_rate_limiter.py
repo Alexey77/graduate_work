@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+import logging
 import random
 import time
 
@@ -33,7 +34,7 @@ async def make_requests(url, num_users, num_requests_per_user):
                 tasks.append(task)
         responses = await asyncio.gather(*tasks)
         for status_code, response_time in responses:
-            print(f"Response Status: {status_code}, User ID:{user_id}, Response Time: {response_time:.4f} sec User: {headers['X-Forwarded-For']}")
+            logging.info(f"Response Status: {status_code}, User ID:{user_id}, Response Time: {response_time:.4f} sec User: {headers['X-Forwarded-For']}")
 
 
 if __name__ == "__main__":
