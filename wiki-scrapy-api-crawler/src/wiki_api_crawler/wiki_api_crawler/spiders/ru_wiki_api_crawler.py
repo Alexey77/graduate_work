@@ -1,44 +1,25 @@
 import scrapy
 import json
-from urllib.parse import urlencode, quote
+from enum import IntEnum
 from datetime import datetime
+from urllib.parse import urlencode
 
 from ..items import WikiPageItem
+
+
+class WikiNamespace(IntEnum):
+    PAGE = 0
+    CATEGORY = 14
 
 
 class RuWikiApiCrawlerSpider(scrapy.Spider):
     name = "ru_wiki_api_crawler"
     allowed_domains = ["ru.wikipedia.org"]
     categories = [
-        "Категория:Фильмы",
-        "Категория:Фильмы_по_алфавиту",
-        "Категория:Кинорежиссёры_по_алфавиту",
-
-        "Категория:Кинопродюсеры_по_алфавиту",
-        "Категория:Кинопродюсеры_XX_века",
-        "Категория:Кинопродюсеры_XXI_века",
-
-        "Категория:Сценаристы_по_алфавиту",
-        "Категория:Режиссёры-постановщики_по_алфавиту",
-        "Категория:Кинооператоры_по_алфавиту",
-
-        "Категория:Киноактёры_США",
-        "Категория:Лауреаты_премии_BAFTA",
-        "Категория:Лауреаты_премии_«Оскар»",
-        "Категория:Актёры_XXI_века",
-        "Категория:Актёры_XX_века",
-        "Категория:Актёры_мыльных_опер_США",
-        "Категория:Актёры_по_алфавиту",
-        "Категория:Актёры_по_алфавиту",
-        "Категория:Актёры_СССР",
-        "Категория:Народные_артисты_РСФСР",
-        "Категория:Заслуженные_артисты_РСФСР",
-        "Категория:Народные_артисты_СССР",
-
-        "Категория:Актрисы_по_алфавиту",
-        "Категория:Актрисы_XX_века",
-        "Категория:Актрисы_XXI_века",
+        "Категория:Кинематограф",
+        "Категория:Киноактёры"
     ]
+    skip_categories = ["Категория:Изображения"]
     base_url = "https://ru.wikipedia.org/w/api.php"
 
     def start_requests(self):
@@ -48,18 +29,21 @@ class RuWikiApiCrawlerSpider(scrapy.Spider):
                 'format': 'json',
                 'list': 'categorymembers',
                 'cmtitle': category,
-                'cmtype': 'subcat',
+                'cmtype': 'subcat|page',
                 'cmlimit': 'max'
             }
             url = f"{self.base_url}?{urlencode(params)}"
-            yield scrapy.Request(url, callback=self.parse_category)
+            yield scrapy.Request(url, callback=self.parse_category, meta={'category': category})
 
     def parse_category(self, response):
         data = json.loads(response.body)
 
-        # Обрабатываем текущую порцию категорий
         for member in data['query']['categorymembers']:
-            if member['ns'] == 14:  # Namespace 14 is for categories
+            if member['ns'] == WikiNamespace.CATEGORY:
+                skip_category = any(member['title'].startswith(skip_cat) for skip_cat in self.skip_categories)
+                if skip_category:
+                    continue
+
                 params = {
                     'action': 'query',
                     'format': 'json',
@@ -69,9 +53,17 @@ class RuWikiApiCrawlerSpider(scrapy.Spider):
                     'cmlimit': 'max'
                 }
                 url = f"{self.base_url}?{urlencode(params)}"
-                yield scrapy.Request(url, callback=self.parse_subcategory)
+                yield scrapy.Request(url, callback=self.parse_category, meta={'category': member['title']})
+            elif member['ns'] == WikiNamespace.PAGE:
+                params = {
+                    'action': 'parse',
+                    'format': 'json',
+                    'page': member['title'],
+                    'prop': 'wikitext'
+                }
+                url = f"{self.base_url}?{urlencode(params)}"
+                yield scrapy.Request(url, callback=self.parse_page)
 
-        # Проверяем, есть ли в ответе параметр для пагинации
         if 'continue' in data:
             cmcontinue = data['continue']['cmcontinue']
             category = response.meta['category']
@@ -87,31 +79,36 @@ class RuWikiApiCrawlerSpider(scrapy.Spider):
             url = f"{self.base_url}?{urlencode(params)}"
             yield scrapy.Request(url, callback=self.parse_category, meta={'category': category})
 
-    def parse_subcategory(self, response):
-        data = json.loads(response.body)
-        for member in data['query']['categorymembers']:
-            if member['ns'] == 0:  # Namespace 0 is for regular pages
-                params = {
-                    'action': 'parse',
-                    'format': 'json',
-                    'page': member['title'],
-                    'prop': 'wikitext'
-                }
-                url = f"{self.base_url}?{urlencode(params)}"
-                yield scrapy.Request(url, callback=self.parse_page)
-
     def parse_page(self, response):
         data = json.loads(response.body)
-        wikitext = data['parse']['wikitext']['*']
-        title = data['parse']['title']
+        page_id = data['parse']['pageid']
 
-        item = WikiPageItem()
-        item['wikitext'] = wikitext
+        item = WikiPageItem(
+            title=data['parse']['title'],
+            wikitext=data['parse']['wikitext']['*'],
+            url=response.url,
+            page_id=data['parse']['pageid']
+        )
         item['meta'] = {
-            'title': title,
             'source': 'ru.wikipedia.org',
             'time_request': datetime.now().isoformat(),
-            'url': response.url,
             'lang': 'ru'
         }
+
+        api_url = f"https://ru.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=ids&format=json&pageids={page_id}"
+
+        yield scrapy.Request(api_url, callback=self.parse_page_revision, meta={'item': item})
+
+    def parse_page_revision(self, response):
+        item = response.meta['item']
+        data = json.loads(response.text)
+
+        pages = data.get("query", {}).get("pages", {})
+        for page in pages.values():
+            if "revisions" in page:
+                item["revision_id"] = page["revisions"][0]["revid"]
+                break
+        else:
+            self.logger.warning(f"No revision ID found for page with id {item['page_id']}")
+
         yield item

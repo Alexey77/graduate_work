@@ -54,7 +54,8 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-   'wiki_api_crawler.pipelines.WikiCrawlerPipeline': 300,
+   # 'wiki_api_crawler.pipelines.WikiCrawlerPipeline': 300,
+   'wiki_api_crawler.pipelines.WikiCrawlerDBPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
