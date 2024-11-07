@@ -1,0 +1,9 @@
+FROM python:3.12-slim-bookworm
+
+WORKDIR /app
+COPY . .
+RUN  pip install --upgrade pip\
+     && pip install -r requirements.txt
+
+ENV PYTHONPATH=/app
+CMD ["python", "tests/test_chat_completion.py"]

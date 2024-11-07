@@ -13,6 +13,17 @@ services:
       - text_vector_service
       - rabbitmq
 
+  test_assistant_service:
+    build:
+      context: ./assistant_service
+      dockerfile: Dockerfile.test
+    depends_on:
+      - assistant_service
+    environment:
+      - SERVICE_HOST=assistant_service
+      - SERVICE_PORT=8000
+    command: pytest -s
+
   llm_service:
     build: ./llm_service
     ports:

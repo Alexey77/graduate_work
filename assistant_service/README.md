@@ -23,3 +23,9 @@ path \assistant_service
   -p 27017:27017 \
   -v mongodb_data:/data/db \
   mongo:8.0.1-noble`
+
+
+
+### tests
+
+`docker-compose run --rm test_assistant_service`
