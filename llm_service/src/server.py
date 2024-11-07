@@ -5,10 +5,10 @@ import warnings
 from pathlib import Path
 
 import grpc
-from core.config import grpc_server_settings as settings
-from core.logger import get_logger
-from grpc_generated import llm_pb2_grpc
-from handlers import LLMHandler
+from src.core.config import grpc_server_settings as settings
+from src.core.logger import get_logger
+from src.grpc_generated import llm_pb2_grpc
+from src.handlers import LLMHandler
 
 warnings.filterwarnings("ignore", category=UserWarning)
 

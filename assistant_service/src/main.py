@@ -18,7 +18,7 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Service started")
     app.state.mongo = AsyncMongoClient(settings.MONGO.uri)
-    app.state.llm_service = LLMClient(address="localhost:50051")
+    app.state.llm_service = LLMClient(address="llm_service:50051")
 
     # Shutdown
     try:

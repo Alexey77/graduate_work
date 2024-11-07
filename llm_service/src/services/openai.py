@@ -1,9 +1,9 @@
 from typing import Any
 
-from core.logger import get_logger
-from networking.aiohttp import send_post
+from src.core.logger import get_logger
+from src.networking.aiohttp import send_post
 
-from services.base_service import BaseLLMService
+from src.services.base_service import BaseLLMService
 
 logger = get_logger(__name__)
 

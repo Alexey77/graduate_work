@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 import grpc
-from core.logger import get_logger
+from src.core.logger import get_logger
 from grpc import StatusCode
 
 current_dir = Path(__file__).parent.parent.resolve()
@@ -14,8 +14,8 @@ from grpc_generated.llm_pb2 import (
     LLMRequest,
     LLMResponse,
 )
-from networking.exception import NetworkException
-from services.factory import get_llm_service
+from src.networking.exception import NetworkException
+from src.services.factory import get_llm_service
 
 current_dir = Path(__file__).parent.resolve()
 sys.path.insert(0, str(current_dir / 'grpc_generated'))

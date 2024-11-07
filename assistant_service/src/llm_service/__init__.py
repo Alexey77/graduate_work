@@ -31,7 +31,7 @@ class LLMClient:
         self.stub: llm_pb2_grpc.LlmServiceStub | None = None
 
     async def get_similar_fragments(self, text: str, limit: int = 5) -> list:
-        async with grpc.aio.insecure_channel("0.0.0.0:50052") as channel:
+        async with grpc.aio.insecure_channel("text_vector_service:50052") as channel:
             similarity_stub = similarity_search_pb2_grpc.SimilaritySearchServiceStub(channel)
             similarity_request = similarity_search_pb2.SearchRequest(
                 text=text,
