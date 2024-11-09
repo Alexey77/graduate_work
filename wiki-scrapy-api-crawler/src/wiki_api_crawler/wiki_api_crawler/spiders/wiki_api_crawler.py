@@ -4,9 +4,10 @@ from urllib.parse import urlencode
 
 import scrapy
 from scrapy import signals
-from ..settings import DB_URI
+
 from ..database.wiki import WikiPageDatabaseManager
 from ..items import WikiPageItem
+from ..settings import DB_URI
 
 
 class WikiNamespace(IntEnum):

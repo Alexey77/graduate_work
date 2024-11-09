@@ -6,7 +6,6 @@ from pathlib import Path
 from urllib.parse import unquote
 
 # useful for handling different item types with a single interface
-from itemadapter import ItemAdapter, is_item
 from loguru import logger
 from scrapy import signals
 
