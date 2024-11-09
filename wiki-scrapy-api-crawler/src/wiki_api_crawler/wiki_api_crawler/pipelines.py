@@ -1,28 +1,28 @@
+import hashlib
 import json
 import sqlite3
+from datetime import datetime
 from pathlib import Path
-import hashlib
+
+from .settings import DB_URI
 
 
 class WikiCrawlerFilePipeline:
     def process_item(self, item, spider):
-        result = {
-            "wikitext": item['wikitext'],
-            "meta": item['meta']
-        }
 
+        result = dict(item)
         output_dir = Path('output')
         output_dir.mkdir(exist_ok=True)
 
         # Создаем хеш от заголовка и используем первые два символа для подпапки
-        title_hash = hashlib.md5(item['meta']['title'].encode()).hexdigest()
+        title_hash = hashlib.md5(item['title'].encode()).hexdigest()
         subfolder = title_hash[:2]
 
-        file_path = output_dir / subfolder
+        # file_path = output_dir / subfolder
+        file_path = output_dir
         file_path.mkdir(exist_ok=True)
 
-        # Сохранение файла
-        filename = file_path / f"{item['meta']['title']}.json"
+        filename = file_path / f"{item['title']}.json"
 
         with filename.open('w', encoding='utf-8') as f:
             json.dump(result, f, ensure_ascii=False, indent=4)
@@ -30,9 +30,51 @@ class WikiCrawlerFilePipeline:
         return item
 
 
+class AddTimeRequest:
+    def process_item(self, item, spider):
+        item["time_request"] = datetime.now().isoformat()
+        return item
+
+
+class AddCreatedAt:
+    def process_item(self, item, spider):
+        item["created_at"] = datetime.now().isoformat()
+        return item
+
+
+class AddUpdatedAt:
+    def process_item(self, item, spider):
+        item["updated_at"] = datetime.now().isoformat()
+        return item
+
+
+class AddLanguage:
+    def process_item(self, item, spider):
+        item["lang"] = spider.language
+        return item
+
+
+class AddSource:
+    def process_item(self, item, spider):
+        item["source"] = f"{spider.language}.wikipedia.org"
+        return item
+
+
+class WikiSQlitePipeline:
+    def process_item(self, item, spider):
+
+        try:
+            spider.db.insert_or_update_item(item)
+            spider.logger.info(f"Item with page_id {item['page_id']} processed successfully.")
+        except Exception as e:
+            spider.logger.error(f"Error processing item with page_id {item['page_id']}: {e}")
+            raise
+        return item
+
+
 class WikiCrawlerDBPipeline:
     def open_spider(self, spider):
-        self.connection = sqlite3.connect("output/wikipedia_movies_data.db")
+        self.connection = sqlite3.connect(DB_URI)
         self.cursor = self.connection.cursor()
 
         # Create table for storing Wikipedia data

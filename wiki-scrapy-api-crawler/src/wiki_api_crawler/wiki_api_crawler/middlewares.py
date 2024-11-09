@@ -4,10 +4,11 @@
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 from pathlib import Path
 from urllib.parse import unquote
-from scrapy import signals
-from loguru import logger
+
 # useful for handling different item types with a single interface
-from itemadapter import is_item, ItemAdapter
+from itemadapter import ItemAdapter, is_item
+from loguru import logger
+from scrapy import signals
 
 
 def setup_loguru_logger():

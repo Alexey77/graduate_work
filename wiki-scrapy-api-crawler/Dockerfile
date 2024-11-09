@@ -12,4 +12,4 @@ COPY src /app/src
 
 WORKDIR /app/src/wiki_api_crawler
 
-CMD ["scrapy", "crawl", "ru_wiki_api_crawler"]
+CMD ["scrapy", "crawl", "wiki_api_crawler"]

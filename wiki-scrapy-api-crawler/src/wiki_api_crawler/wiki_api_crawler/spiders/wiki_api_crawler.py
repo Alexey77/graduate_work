@@ -1,9 +1,11 @@
-import scrapy
 import json
 from enum import IntEnum
-from datetime import datetime
 from urllib.parse import urlencode
 
+import scrapy
+from scrapy import signals
+from ..settings import DB_URI
+from ..database.wiki import WikiPageDatabaseManager
 from ..items import WikiPageItem
 
 
@@ -12,15 +14,17 @@ class WikiNamespace(IntEnum):
     CATEGORY = 14
 
 
-class RuWikiApiCrawlerSpider(scrapy.Spider):
-    name = "ru_wiki_api_crawler"
-    allowed_domains = ["ru.wikipedia.org"]
+class WikiApiCrawlerSpider(scrapy.Spider):
+    name = "wiki_api_crawler"
+    language = "ru"
+    allowed_domains = [f"{language}.wikipedia.org"]
     categories = [
+        # "Категория:Фильмы_России_1910_года", # для отладки маленькая категория
         "Категория:Кинематограф",
         "Категория:Киноактёры"
     ]
     skip_categories = ["Категория:Изображения"]
-    base_url = "https://ru.wikipedia.org/w/api.php"
+    base_url = f"https://{language}.wikipedia.org/w/api.php"
 
     def start_requests(self):
         for category in self.categories:
@@ -32,8 +36,32 @@ class RuWikiApiCrawlerSpider(scrapy.Spider):
                 'cmtype': 'subcat|page',
                 'cmlimit': 'max'
             }
-            url = f"{self.base_url}?{urlencode(params)}"
-            yield scrapy.Request(url, callback=self.parse_category, meta={'category': category})
+            url = self.construct_url(params=params)
+            yield scrapy.Request(url, callback=self.parse_category,
+                                 meta={'category': category})
+
+    @classmethod
+    def from_crawler(cls, crawler, *args, **kwargs):
+        spider = super().from_crawler(crawler, *args, **kwargs)
+
+        crawler.signals.connect(spider.spider_opened, signal=signals.spider_opened)
+        crawler.signals.connect(spider.spider_closed, signal=signals.spider_closed)
+        return spider
+
+    def spider_opened(self):
+
+        self.db = WikiPageDatabaseManager(db_path=DB_URI)
+        self.db.create_database()
+        self.logger.info("The connection to the database is established")
+
+    def spider_closed(self):
+
+        if self.db:
+            self.db.close()
+            self.logger.info("The connection to the database is closed")
+
+    def construct_url(self, params):
+        return f"{self.base_url}?{urlencode(params)}"
 
     def parse_category(self, response):
         data = json.loads(response.body)
@@ -52,7 +80,7 @@ class RuWikiApiCrawlerSpider(scrapy.Spider):
                     'cmtype': 'subcat|page',
                     'cmlimit': 'max'
                 }
-                url = f"{self.base_url}?{urlencode(params)}"
+                url = self.construct_url(params=params)
                 yield scrapy.Request(url, callback=self.parse_category, meta={'category': member['title']})
             elif member['ns'] == WikiNamespace.PAGE:
                 params = {
@@ -61,7 +89,7 @@ class RuWikiApiCrawlerSpider(scrapy.Spider):
                     'page': member['title'],
                     'prop': 'wikitext'
                 }
-                url = f"{self.base_url}?{urlencode(params)}"
+                url = self.construct_url(params=params)
                 yield scrapy.Request(url, callback=self.parse_page)
 
         if 'continue' in data:
@@ -76,7 +104,7 @@ class RuWikiApiCrawlerSpider(scrapy.Spider):
                 'cmlimit': 'max',
                 'cmcontinue': cmcontinue
             }
-            url = f"{self.base_url}?{urlencode(params)}"
+            url = self.construct_url(params=params)
             yield scrapy.Request(url, callback=self.parse_category, meta={'category': category})
 
     def parse_page(self, response):
@@ -89,13 +117,15 @@ class RuWikiApiCrawlerSpider(scrapy.Spider):
             url=response.url,
             page_id=data['parse']['pageid']
         )
-        item['meta'] = {
-            'source': 'ru.wikipedia.org',
-            'time_request': datetime.now().isoformat(),
-            'lang': 'ru'
-        }
 
-        api_url = f"https://ru.wikipedia.org/w/api.php?action=query&prop=revisions&rvprop=ids&format=json&pageids={page_id}"
+        params = {
+            "action": "query",
+            "prop": "revisions",
+            "rvprop": "ids",
+            "format": "json",
+            "pageids": page_id
+        }
+        api_url = self.construct_url(params)
 
         yield scrapy.Request(api_url, callback=self.parse_page_revision, meta={'item': item})
 
