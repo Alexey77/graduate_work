@@ -1,7 +1,6 @@
-aio-pika~=9.4.3
-grpcio~=1.67.0
-grpcio-tools~=1.67.0
-fastapi~=0.115.2
+grpcio~=1.67.1
+grpcio-tools~=1.67.1
+fastapi~=0.115.4
 loguru~=0.7.2
 pydantic~=2.9.2
 pydantic-settings~=2.6.0
