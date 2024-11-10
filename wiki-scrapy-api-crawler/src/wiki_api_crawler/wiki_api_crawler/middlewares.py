@@ -9,13 +9,15 @@ from urllib.parse import unquote
 from loguru import logger
 from scrapy import signals
 
+from .settings import LOG_DIR
+
 
 def setup_loguru_logger():
-    log_dir = Path('output') / '_LOG'
-    log_dir.mkdir(parents=True, exist_ok=True)
+
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
 
     logger.add(
-        log_dir / "scrapy_log_{time}.log",
+        LOG_DIR / "scrapy_log_{time}.log",
         rotation="10 MB",  # Ротация файлов при достижении 10 MB
         # retention="10 days", # Удаление старых логов старше 10 дней
         compression="zip",  # Архивация логов

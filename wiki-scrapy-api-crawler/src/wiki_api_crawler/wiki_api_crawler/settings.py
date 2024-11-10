@@ -1,3 +1,5 @@
+from pathlib import Path
+
 BOT_NAME = "wiki_api_crawler"
 
 SPIDER_MODULES = ["wiki_api_crawler.spiders"]
@@ -53,14 +55,11 @@ DOWNLOADER_MIDDLEWARES = {
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
-    'wiki_api_crawler.pipelines.AddTimeRequest': 100,
-    'wiki_api_crawler.pipelines.AddCreatedAt': 101,
-    'wiki_api_crawler.pipelines.AddUpdatedAt': 102,
+    'wiki_api_crawler.pipelines.AddTimes': 100,
     'wiki_api_crawler.pipelines.AddLanguage': 110,
     'wiki_api_crawler.pipelines.AddSource': 120,
-    # 'wiki_api_crawler.pipelines.WikiCrawlerFilePipeline': 300,
     'wiki_api_crawler.pipelines.WikiSQlitePipeline': 400,
-    # 'wiki_api_crawler.pipelines.WikiCrawlerDBPipeline': 300,
+    # 'wiki_api_crawler.pipelines.WikiCrawlerFilePipeline': 500,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)
@@ -93,5 +92,5 @@ LOG_LEVEL = 'INFO'
 LOG_FORMAT = '%(levelname)s: %(message)s'
 LOG_SHORT_NAMES = True
 
-# DB_URI = "sqlite:///output/wikipedia_movies.sqlite"
-DB_URI = "output/wikipedia_movies.sqlite"
+DB_PATH = "output/wikipedia_movies.sqlite"
+LOG_DIR = Path('output') / '_LOG'

@@ -5,9 +5,11 @@ from urllib.parse import urlencode
 import scrapy
 from scrapy import signals
 
-from ..database.wiki import WikiPageDatabaseManager
+from database.connection import DatabaseConnection
+from database.wiki_repository import WikiPageRepository
+
 from ..items import WikiPageItem
-from ..settings import DB_URI
+from ..settings import DB_PATH
 
 
 class WikiNamespace(IntEnum):
@@ -20,9 +22,9 @@ class WikiApiCrawlerSpider(scrapy.Spider):
     language = "ru"
     allowed_domains = [f"{language}.wikipedia.org"]
     categories = [
-        # "Категория:Фильмы_России_1910_года", # для отладки маленькая категория
-        "Категория:Кинематограф",
-        "Категория:Киноактёры"
+        "Категория:Фильмы_России_1910_года",  # для отладки маленькая категория
+        # "Категория:Кинематограф",
+        # "Категория:Киноактёры"
     ]
     skip_categories = ["Категория:Изображения"]
     base_url = f"https://{language}.wikipedia.org/w/api.php"
@@ -51,15 +53,14 @@ class WikiApiCrawlerSpider(scrapy.Spider):
 
     def spider_opened(self):
 
-        self.db = WikiPageDatabaseManager(db_path=DB_URI)
+        self.connection = DatabaseConnection(db_path=DB_PATH)
+        self.db = WikiPageRepository(connection=self.connection)
         self.db.create_database()
-        self.logger.info("The connection to the database is established")
 
     def spider_closed(self):
 
-        if self.db:
-            self.db.close()
-            self.logger.info("The connection to the database is closed")
+        if self.connection:
+            self.connection.close()
 
     def construct_url(self, params):
         return f"{self.base_url}?{urlencode(params)}"
