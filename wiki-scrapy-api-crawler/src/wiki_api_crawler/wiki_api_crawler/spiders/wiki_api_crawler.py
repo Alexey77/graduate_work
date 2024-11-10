@@ -3,13 +3,12 @@ from enum import IntEnum
 from urllib.parse import urlencode
 
 import scrapy
-from scrapy import signals
-
 from database.connection import DatabaseConnection
 from database.wiki_repository import WikiPageRepository
+from scrapy import signals
 
-from ..items import WikiPageItem
-from ..settings import DB_PATH
+from wiki_api_crawler.items import WikiPageItem
+from wiki_api_crawler.settings import DB_PATH
 
 
 class WikiNamespace(IntEnum):

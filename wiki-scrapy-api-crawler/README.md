@@ -10,3 +10,8 @@
 
 
 * `scrapy crawl wiki_api_crawler` (path: \src\wiki_api_crawler)
+
+
+## List of categories
+
+* wiki_api_crawler/wiki_api_crawler/spiders/wiki_api_crawler.py

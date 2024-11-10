@@ -2,7 +2,6 @@
 #
 # See documentation in:
 # https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-from pathlib import Path
 from urllib.parse import unquote
 
 # useful for handling different item types with a single interface
@@ -13,7 +12,6 @@ from .settings import LOG_DIR
 
 
 def setup_loguru_logger():
-
     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
     logger.add(
@@ -77,8 +75,7 @@ class WikiApiCrawlerSpiderMiddleware:
         # it has processed the response.
 
         # Must return an iterable of Request, or item objects.
-        for i in result:
-            yield i
+        yield from result
 
     def process_spider_exception(self, response, exception, spider):
         # Called when a spider or process_spider_input() method
@@ -93,11 +90,10 @@ class WikiApiCrawlerSpiderMiddleware:
         # that it doesn’t have a response associated.
 
         # Must return only requests (not items).
-        for r in start_requests:
-            yield r
+        yield from start_requests
 
     def spider_opened(self, spider):
-        spider.logger.info("Spider opened: %s" % spider.name)
+        spider.logger.info(f"Spider opened: {spider.name}")
 
 
 class WikiApiCrawlerDownloaderMiddleware:
@@ -144,4 +140,4 @@ class WikiApiCrawlerDownloaderMiddleware:
         pass
 
     def spider_opened(self, spider):
-        spider.logger.info("Spider opened: %s" % spider.name)
+        spider.logger.info(f"Spider opened: {spider.name}")
