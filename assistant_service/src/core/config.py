@@ -22,12 +22,18 @@ class AuthServiceSettings(BaseSettings):
 class GrpcServiceSettings(BaseSettings):
     HOST: Annotated[str, Field(min_length=1)]
     PORT: Annotated[int, Field(gt=1023, lt=65536)]
-    SERVICE: Annotated[int, Field(gt=0, lt=5)]
 
+    DEFAULT_SERVICE: Annotated[int, Field(gt=0, lt=5)]
     DEFAULT_MODEL: Annotated[str, Field(min_length=1)]
+
+    INTENT_SERVICE: Annotated[int, Field(gt=0, lt=5)]
     INTENT_MODEL: Annotated[str, Field(min_length=1)]
+
+    RAG_SERVICE: Annotated[int, Field(gt=0, lt=5)]
     RAG_MODEL: Annotated[str, Field(min_length=1)]
 
+class IntentSettings(BaseSettings): # TODO вынести из GrpcServiceSettings
+    pass
 
 class LLMService(GrpcServiceSettings):
 
