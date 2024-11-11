@@ -24,19 +24,23 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\tllm.proto\x12\nllmservice\"~\n\nLLMRequest\x12+\n\x07service\x18\x01 \x01(\x0e\x32\x1a.llmservice.ApiServiceName\x12\r\n\x05model\x18\x02 \x01(\t\x12\x0e\n\x06system\x18\x03 \x01(\t\x12\x12\n\nmax_tokens\x18\x04 \x01(\x05\x12\x10\n\x08messages\x18\x05 \x01(\t\"C\n\x0bLLMResponse\x12\x13\n\x0bstatus_code\x18\x01 \x01(\x05\x12\r\n\x05reply\x18\x02 \x01(\t\x12\x10\n\x08response\x18\x03 \x01(\t*E\n\x0e\x41piServiceName\x12\n\n\x06OPENAI\x10\x00\x12\r\n\tANTHROPIC\x10\x01\x12\n\n\x06GOOGLE\x10\x02\x12\x0c\n\x08PROXYAPI\x10\x03\x32N\n\nLlmService\x12@\n\rGetCompletion\x12\x16.llmservice.LLMRequest\x1a\x17.llmservice.LLMResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\tllm.proto\x12\nllmservice\"~\n\nLLMRequest\x12+\n\x07service\x18\x01 \x01(\x0e\x32\x1a.llmservice.ApiServiceName\x12\r\n\x05model\x18\x02 \x01(\t\x12\x0e\n\x06system\x18\x03 \x01(\t\x12\x12\n\nmax_tokens\x18\x04 \x01(\x05\x12\x10\n\x08messages\x18\x05 \x01(\t\"C\n\x0bLLMResponse\x12\x13\n\x0bstatus_code\x18\x01 \x01(\x05\x12\r\n\x05reply\x18\x02 \x01(\t\x12\x10\n\x08response\x18\x03 \x01(\t\"\xb0\x01\n\x12LLMFunctionRequest\x12+\n\x07service\x18\x01 \x01(\x0e\x32\x1a.llmservice.ApiServiceName\x12\r\n\x05model\x18\x02 \x01(\t\x12\x0e\n\x06system\x18\x03 \x01(\t\x12\x12\n\nmax_tokens\x18\x04 \x01(\x05\x12\x10\n\x08messages\x18\x05 \x01(\t\x12\x11\n\tfunctions\x18\x06 \x01(\t\x12\x15\n\rfunction_call\x18\x07 \x01(\t\"K\n\x13LLMFunctionResponse\x12\x13\n\x0bstatus_code\x18\x01 \x01(\x05\x12\r\n\x05reply\x18\x02 \x01(\t\x12\x10\n\x08response\x18\x03 \x01(\t*E\n\x0e\x41piServiceName\x12\n\n\x06OPENAI\x10\x00\x12\r\n\tANTHROPIC\x10\x01\x12\n\n\x06GOOGLE\x10\x02\x12\x0c\n\x08PROXYAPI\x10\x03\x32\x9f\x01\n\nLlmService\x12@\n\rGetCompletion\x12\x16.llmservice.LLMRequest\x1a\x17.llmservice.LLMResponse\x12O\n\x0cGetFunctions\x12\x1e.llmservice.LLMFunctionRequest\x1a\x1f.llmservice.LLMFunctionResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'llm_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_APISERVICENAME']._serialized_start=222
-  _globals['_APISERVICENAME']._serialized_end=291
+  _globals['_APISERVICENAME']._serialized_start=478
+  _globals['_APISERVICENAME']._serialized_end=547
   _globals['_LLMREQUEST']._serialized_start=25
   _globals['_LLMREQUEST']._serialized_end=151
   _globals['_LLMRESPONSE']._serialized_start=153
   _globals['_LLMRESPONSE']._serialized_end=220
-  _globals['_LLMSERVICE']._serialized_start=293
-  _globals['_LLMSERVICE']._serialized_end=371
+  _globals['_LLMFUNCTIONREQUEST']._serialized_start=223
+  _globals['_LLMFUNCTIONREQUEST']._serialized_end=399
+  _globals['_LLMFUNCTIONRESPONSE']._serialized_start=401
+  _globals['_LLMFUNCTIONRESPONSE']._serialized_end=476
+  _globals['_LLMSERVICE']._serialized_start=550
+  _globals['_LLMSERVICE']._serialized_end=709
 # @@protoc_insertion_point(module_scope)

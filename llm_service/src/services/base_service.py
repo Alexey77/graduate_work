@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from src.core.config import ProxySocks5
+from core.config import ProxySocks5
 
 
 class BaseLLMService(ABC):

@@ -1,9 +1,8 @@
 from typing import Any
 
-from src.core.logger import get_logger
-from src.networking.aiohttp import send_post
-
-from src.services.base_service import BaseLLMService
+from core.logger import get_logger
+from networking.aiohttp import send_post
+from services.base_service import BaseLLMService
 
 logger = get_logger(__name__)
 
@@ -33,7 +32,11 @@ class OpenAIService(BaseLLMService):
         logger.debug(f"Prepared messages: {messages}")
         return messages
 
-    def prepare_data(self, model_name: str, system_prompt: str, max_tokens: int, messages: list[dict]) -> dict:
+    def prepare_data(self,
+                     model_name: str,
+                     system_prompt: str,
+                     max_tokens: int,
+                     messages: list[dict]) -> dict:
         data = {
             "model": model_name,
             "messages": self.prepare_messages(system_prompt, messages),
@@ -42,18 +45,48 @@ class OpenAIService(BaseLLMService):
         logger.info(f"Prepared data with model: {model_name}, max_tokens: {max_tokens}")
         return data
 
-    async def send_post(self, data: dict, headers: dict, proxy=None) -> tuple[int, Any]:
+    async def send_post(self,
+                        data: dict,
+                        headers: dict,
+                        proxy=None) -> tuple[int, Any]:
         logger.debug(f"Sending POST request to {self._base_url} with data: {data} and headers: {headers}")
         logger.info(f"Sending POST request to {self._base_url}")
         return await send_post(self._base_url, data, headers)
 
+    def prepare_data_with_functions(self,
+                                    model_name: str,
+                                    system_prompt: str,
+                                    max_tokens: int,
+                                    messages: list[dict],
+                                    functions: list[dict],
+                                    function_call: str) -> dict:
+        data = {
+            "model": model_name,
+            "messages": self.prepare_messages(system_prompt, messages),
+            "max_tokens": max_tokens,
+            "functions": functions,
+            "function_call": function_call
+        }
+        logger.info(f"Prepared data with model: {model_name}, max_tokens: {max_tokens}, functions included")
+        return data
+
     def get_reply(self, response: dict[str, Any]) -> str:
-        """Extracts and returns the assistant's reply content from the response."""
+        """Extracts and returns the assistant's reply content or function call from the response."""
         try:
-            content = response["choices"][0]["message"]["content"]
-            logger.debug(f"Extracted content from response: {content}")
-            return content
+            message = response["choices"][0]["message"]
+            if "content" in message and message["content"]:
+                content = message["content"]
+                logger.debug(f"Extracted content from response: {content}")
+                return content
+            elif "function_call" in message and message["function_call"]:
+                function_call = message["function_call"]
+                logger.debug(f"Extracted function call from response: {function_call}")
+                return function_call
+            else:
+                msg = f"No content or function call found in response message: {message}"
+                logger.error(msg)
+                raise ValueError(msg)
         except (KeyError, IndexError) as e:
             msg = f"Failed to parse response: {response} with error: {e}"
             logger.error(msg)
-            raise ValueError
+            raise ValueError(msg)

@@ -1,8 +1,8 @@
 import aiohttp
 from aiohttp import ClientError, ClientResponseError
 from aiohttp_socks import ProxyConnector
-from src.core.config import ProxySocks5
-from src.core.logger import get_logger
+from core.config import ProxySocks5
+from core.logger import get_logger
 
 from .exception import NetworkException
 

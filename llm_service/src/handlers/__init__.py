@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 import grpc
-from src.core.logger import get_logger
+from core.logger import get_logger
 from grpc import StatusCode
 
 current_dir = Path(__file__).parent.parent.resolve()
@@ -11,11 +11,13 @@ grpc_generated_path = current_dir / 'grpc_generated'
 sys.path.insert(0, str(grpc_generated_path))
 
 from grpc_generated.llm_pb2 import (
+    LLMFunctionRequest,
+    LLMFunctionResponse,
     LLMRequest,
     LLMResponse,
 )
-from src.networking.exception import NetworkException
-from src.services.factory import get_llm_service
+from networking.exception import NetworkException
+from services.factory import get_llm_service
 
 current_dir = Path(__file__).parent.resolve()
 sys.path.insert(0, str(current_dir / 'grpc_generated'))
@@ -27,6 +29,7 @@ logger = get_logger(__name__)
 
 
 class LLMHandler(llm_pb2_grpc.LlmServiceServicer):
+
     async def GetCompletion(
             self,
             request,
@@ -74,12 +77,74 @@ class LLMHandler(llm_pb2_grpc.LlmServiceServicer):
                 status_code=503,
                 response=str(e)
             )
-        except Exception as e: # noqa: BLE001
+        except Exception as e:  # noqa: BLE001
             msg = f"Unhandled exception encountered:{e}"
             logger.error(msg)
             context.set_code(StatusCode.INTERNAL)
             context.set_details(str(e))
             return LLMResponse(
+                status_code=500,
+                response=str(e)
+            )
+
+    async def GetFunctions(
+            self,
+            request,
+            context: grpc.aio.ServicerContext
+    ) -> LLMFunctionResponse:
+
+        try:
+            service_name: str = llm_pb2.ApiServiceName.Name(request.service)
+            logger.info(f"Received function call request with service: {service_name} and model: {request.model}")
+            service = get_llm_service(service_name)
+
+            messages: list[dict] = json.loads(request.messages)
+            functions: list[dict] = json.loads(request.functions) if request.functions else []
+            function_call = request.function_call
+
+            logger.debug("Parsed messages and functions successfully")
+
+            data = service.prepare_data_with_functions(
+                model_name=request.model,
+                system_prompt=request.system,
+                max_tokens=request.max_tokens,
+                messages=messages,
+                functions=functions,
+                function_call=function_call
+            )
+            logger.debug(f"Data prepared for service request: {data}")
+
+            headers = service.prepare_headers()
+
+            status_code, response = await service.send_post(
+                data=data,
+                headers=headers
+            )
+            logger.info(f"Request processed successfully with status code: {status_code}")
+
+            reply = json.dumps(service.get_reply(response=response), ensure_ascii=False)
+            response = json.dumps(response, ensure_ascii=False)
+
+            return LLMFunctionResponse(
+                status_code=status_code,
+                reply=reply,
+                response=response
+            )
+
+        except NetworkException as e:
+            logger.error(f"NetworkException encountered:{e}")
+            context.set_code(StatusCode.UNAVAILABLE)
+            context.set_details(str(e))
+            return LLMFunctionResponse(
+                status_code=503,
+                response=str(e)
+            )
+        except Exception as e:  # noqa: BLE001
+            msg = f"Unhandled exception encountered:{e}"
+            logger.error(msg)
+            context.set_code(StatusCode.INTERNAL)
+            context.set_details(str(e))
+            return LLMFunctionResponse(
                 status_code=500,
                 response=str(e)
             )
