@@ -1,7 +1,8 @@
-from core.logger import get_logger
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import ConnectionFailure, NetworkTimeout, OperationFailure
 from pymongo.results import DeleteResult, InsertOneResult, UpdateResult
+
+from core.logger import get_logger
 
 from .exception import MongoDBException
 

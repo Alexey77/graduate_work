@@ -2,19 +2,18 @@ import json
 from functools import lru_cache
 from typing import TYPE_CHECKING, Any
 
-from dependencies import get_llm_client
 from fastapi import Depends
-from schemes import ReplyResponseModel, Role
 
-if TYPE_CHECKING:
-    from llm_service import LLMClient
 from core.logger import get_logger
+from dependencies import get_llm_client
+from llm import LLMClient
+from schemes import ReplyResponseModel, Role
 
 logger = get_logger(__name__)
 
 
 class RAGService:
-    def __init__(self, llm: "LLMClient") -> None:
+    def __init__(self, llm: LLMClient) -> None:
         self._llm = llm
 
     async def determine_intent(self, user_query: str) -> str:

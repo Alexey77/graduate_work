@@ -5,23 +5,6 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
-class RabbitMQSettings(BaseSettings):
-    USER: Annotated[str, Field(min_length=1)]
-    PASSWORD: Annotated[str, Field(min_length=1)]
-    HOST: Annotated[str, Field(min_length=1)]
-    PORT: Annotated[int, Field(gt=1023, lt=65536)]
-
-    @property
-    def uri(self) -> str:
-        return f'amqp://{self.USER}:{self.PASSWORD}@{self.HOST}:{self.PORT}/'
-
-    model_config = SettingsConfigDict(
-        env_prefix='RABBITMQ_',
-        env_file='.env',
-        extra='ignore',
-        env_file_encoding='utf-8')
-
-
 class AuthServiceSettings(BaseSettings):
     pass
     # url: Annotated[str, Field(min_length=1)]
@@ -39,6 +22,11 @@ class AuthServiceSettings(BaseSettings):
 class GrpcServiceSettings(BaseSettings):
     HOST: Annotated[str, Field(min_length=1)]
     PORT: Annotated[int, Field(gt=1023, lt=65536)]
+    SERVICE: Annotated[int, Field(gt=0, lt=5)]
+
+    DEFAULT_MODEL: Annotated[str, Field(min_length=1)]
+    INTENT_MODEL: Annotated[str, Field(min_length=1)]
+    RAG_MODEL: Annotated[str, Field(min_length=1)]
 
 
 class LLMService(GrpcServiceSettings):
@@ -79,8 +67,8 @@ class Settings(BaseSettings):
     HOST: Annotated[str, Field(min_length=1)]
     PORT: Annotated[int, Field(gt=1023, lt=65536)]
 
-    # RABBIT: RabbitMQSettings = RabbitMQSettings()
     MONGO: MongoDBSettings = MongoDBSettings()
+    LLM: LLMService = LLMService()
 
     model_config = SettingsConfigDict(
         env_prefix='SERVICE_',

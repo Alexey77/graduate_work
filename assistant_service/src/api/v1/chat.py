@@ -1,13 +1,10 @@
 from http import HTTPStatus
 
-from core.logger import get_logger
 from fastapi import APIRouter, Depends
-from fastapi.security import HTTPBearer
-from schemes import (
-    QuestionMessage,
-    ReplyResponseModel,
-    Role,
-)
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+from core.logger import get_logger
+from schemes import ChatMessage, ReplyResponseModel, Role, UserMessage
 from services.rag_service import RAGService, get_rag_service
 
 router = APIRouter()
@@ -15,12 +12,12 @@ security = HTTPBearer()
 logger = get_logger(__name__)
 
 
-@router.post("/completion",
+@router.post("/chat",
              status_code=HTTPStatus.OK,
              response_model=ReplyResponseModel)
 async def question(
-        question_message: QuestionMessage,
-        # credentials: HTTPAuthorizationCredentials = Depends(security),
+        question_message: UserMessage | list[ChatMessage],
+        credentials: HTTPAuthorizationCredentials = Depends(security),
         questions_service: RAGService = Depends(get_rag_service),
         # auth_service: AuthService = Depends(get_auth_service),
         # user_agent: Annotated[str | None, Header()] = None

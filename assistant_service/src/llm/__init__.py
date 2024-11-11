@@ -16,12 +16,8 @@ current_dir = Path(__file__).parent.parent.resolve()
 grpc_generated_path = current_dir / 'grpc_generated'
 sys.path.insert(0, str(grpc_generated_path))
 
-from grpc_generated import (
-    llm_pb2,
-    llm_pb2_grpc,
-    similarity_search_pb2,
-    similarity_search_pb2_grpc,
-)
+from grpc_generated import (llm_pb2, llm_pb2_grpc, similarity_search_pb2,
+                            similarity_search_pb2_grpc)
 
 
 class LLMClient:

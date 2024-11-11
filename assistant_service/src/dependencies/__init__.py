@@ -1,9 +1,9 @@
+from fastapi import Depends, FastAPI
+
 from core.config import settings
 from database.mongodb import AsyncMongoClient
 from database.mongodb.dialog import DialoguesMongoDB
-from fastapi import Depends, FastAPI
-
-from llm_service import LLMClient
+from llm import LLMClient
 
 
 def get_app() -> FastAPI:
@@ -21,4 +21,4 @@ def get_db_dialogue(mongo: AsyncMongoClient = Depends(get_mongo)) -> DialoguesMo
                             collection_name=settings.MONGO.COLLECTION_NAME)
 
 def get_llm_client(app: FastAPI = Depends(get_app)) -> LLMClient:
-    return app.state.llm_service
+    return app.state.llm

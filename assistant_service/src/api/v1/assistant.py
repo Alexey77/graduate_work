@@ -1,16 +1,12 @@
 from http import HTTPStatus
 from typing import Annotated
 
-from core.logger import get_logger
 from fastapi import APIRouter, Depends, Header
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from schemes import (
-    ReplyResponseModel,
-    RequestAsk,
-    RequestReply,
-    ResponseCreatedAsk,
-    ResponseCreatedUnauthorizedAsk,
-)
+
+from core.logger import get_logger
+from schemes import (ReplyResponseModel, RequestAsk, RequestReply,
+                     ResponseCreatedAsk, ResponseCreatedUnauthorizedAsk)
 from services.assistants import AssistantsService, get_assistants_service
 from services.auth import AuthService, get_auth_service
 
