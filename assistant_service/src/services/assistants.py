@@ -1,9 +1,10 @@
 from functools import lru_cache
 from typing import TYPE_CHECKING
 
-from dialog_manager import get_db_dialogue_manager
 from fastapi import Depends
 from pydantic import UUID4
+
+from dialog_manager import get_db_dialogue_manager
 from schemes import Role
 
 if TYPE_CHECKING:

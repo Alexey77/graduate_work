@@ -5,10 +5,9 @@ import warnings
 from pathlib import Path
 
 import grpc
-from src.core.config import grpc_server_settings as settings
-from src.core.logger import get_logger
-from src.grpc_generated import llm_pb2_grpc
-from src.handlers import LLMHandler
+from core.config import grpc_server_settings as settings
+from core.logger import get_logger
+from handlers import LLMHandler
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -17,7 +16,7 @@ grpc_generated_path = current_dir / 'grpc_generated'
 sys.path.insert(0, str(grpc_generated_path))
 
 # ruff: noqa: E402
-
+from grpc_generated import llm_pb2_grpc
 
 logger = get_logger(__name__)
 
@@ -37,13 +36,13 @@ async def serve():
 
     await server.start()
 
-    def graceful_shutdown():
-        logger.info("Shutting down gracefully...")
+    def graceful_shutdown(signum, frame):
+        logger.info(f"Received signal {signum}, shutting down gracefully...")
         asyncio.create_task(stop_server(server))
+        logger.info("Server successfully stopped")
 
-    loop = asyncio.get_running_loop()
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, graceful_shutdown)
+    signal.signal(signal.SIGINT, graceful_shutdown)
+    signal.signal(signal.SIGTERM, graceful_shutdown)
 
     await server.wait_for_termination()
 

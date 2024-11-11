@@ -1,5 +1,5 @@
-from src.core.config import settings
-from src.core.logger import get_logger
+from core.config import settings
+from core.logger import get_logger
 
 from .base_service import BaseLLMService
 from .openai import OpenAIService

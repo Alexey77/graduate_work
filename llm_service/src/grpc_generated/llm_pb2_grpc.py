@@ -3,10 +3,9 @@
 import grpc
 import warnings
 
-from . import llm_pb2 as llm__pb2
+import llm_pb2 as llm__pb2
 
-
-GRPC_GENERATED_VERSION = '1.67.1'
+GRPC_GENERATED_VERSION = '1.67.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -40,12 +39,23 @@ class LlmServiceStub(object):
                 request_serializer=llm__pb2.LLMRequest.SerializeToString,
                 response_deserializer=llm__pb2.LLMResponse.FromString,
                 _registered_method=True)
+        self.GetFunctions = channel.unary_unary(
+                '/llmservice.LlmService/GetFunctions',
+                request_serializer=llm__pb2.LLMFunctionRequest.SerializeToString,
+                response_deserializer=llm__pb2.LLMFunctionResponse.FromString,
+                _registered_method=True)
 
 
 class LlmServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def GetCompletion(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetFunctions(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -58,6 +68,11 @@ def add_LlmServiceServicer_to_server(servicer, server):
                     servicer.GetCompletion,
                     request_deserializer=llm__pb2.LLMRequest.FromString,
                     response_serializer=llm__pb2.LLMResponse.SerializeToString,
+            ),
+            'GetFunctions': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetFunctions,
+                    request_deserializer=llm__pb2.LLMFunctionRequest.FromString,
+                    response_serializer=llm__pb2.LLMFunctionResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -87,6 +102,33 @@ class LlmService(object):
             '/llmservice.LlmService/GetCompletion',
             llm__pb2.LLMRequest.SerializeToString,
             llm__pb2.LLMResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def GetFunctions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/llmservice.LlmService/GetFunctions',
+            llm__pb2.LLMFunctionRequest.SerializeToString,
+            llm__pb2.LLMFunctionResponse.FromString,
             options,
             channel_credentials,
             insecure,

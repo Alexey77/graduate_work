@@ -1,14 +1,11 @@
-import asyncio
+import os
+import sys
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from src.core.config import ProxySocks5, Settings
-from src.networking.aiohttp import send_post
 from src.services.factory import get_llm_service
 from src.services.openai import OpenAIService
 
-import sys
-import os
 sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
 
 class TestOpenAIService(unittest.IsolatedAsyncioTestCase):

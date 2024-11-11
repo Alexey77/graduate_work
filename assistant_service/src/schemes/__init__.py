@@ -17,22 +17,24 @@ class RequestReply(BaseModel):
     id_ask: UUID4
 
 
-class QuestionMessage(BaseModel):
+class UserMessage(BaseModel):
     role: Literal["user"]
-    content: Annotated[str, Field(min_length=1, max_length=4096)]
-    # created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    content: Annotated[str, Field(min_length=1, max_length=4_096)]
 
+class AssistantMessage(BaseModel):
+    role: Literal["assistant"]
+    content: Annotated[str, Field(min_length=1, max_length=16_384)]
 
 # Response
 
-class AnswerMessage(BaseModel):
+class ChatMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: Annotated[str, Field(min_length=1, max_length=4096)]
-    # created_at: datetime
+
 
 
 class ChatResponse(BaseModel):
-    messages: list[AnswerMessage]
+    messages: list[ChatMessage]
 
 
 class ResponseCreatedAsk(BaseModel):
