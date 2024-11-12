@@ -1,8 +1,7 @@
-from fastapi import Depends, FastAPI
-
 from core.config import settings
 from database.mongodb import AsyncMongoClient
 from database.mongodb.dialog import DialoguesMongoDB
+from fastapi import Depends, FastAPI
 from llm import LLMClient
 
 

@@ -1,3 +1,6 @@
-from .get_information_from_rag import function_description as information_from_rag_desc, get_information_from_rag
-from .get_movie_reviews import function_description as movie_reviews_desc, get_movie_reviews
-from .handle_unknown_intent import function_description as unknown_intent_desc, handle_unknown_intent
+from .get_information_from_rag import function_description as information_from_rag_desc
+from .get_information_from_rag import get_information_from_rag
+from .get_movie_reviews import function_description as movie_reviews_desc
+from .get_movie_reviews import get_movie_reviews
+from .handle_unknown_intent import function_description as unknown_intent_desc
+from .handle_unknown_intent import handle_unknown_intent

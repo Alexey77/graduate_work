@@ -1,10 +1,9 @@
 from http import HTTPStatus
 
+from core.logger import get_logger
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-
-from core.logger import get_logger
-from schemes import ChatMessage, ReplyResponseModel, Role, UserMessage
+from schemes import ChatMessage, ReplyResponseModel, UserMessage
 from services.chats import ChatService, get_chat_service
 from services.exception import ServiceException
 from services.rag_service import RAGService, get_rag_service
@@ -25,7 +24,7 @@ async def chat(
         # auth_service: AuthService = Depends(get_auth_service),
         # user_agent: Annotated[str | None, Header()] = None
 ):
-    # access_token = credentials.credentials
+    access_token = credentials.credentials
 
     # Authorization code can be uncommented if needed
     # if access_token is None or not await auth_service.validate_access_token(access_token):
@@ -44,7 +43,7 @@ async def chat(
 
     try:
         messages = await chat_service.get_answer(messages=[question_message], user="ddd")
-    except ServiceException as e:
+    except ServiceException:
         raise HTTPException(
             status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
             detail=HTTPStatus.INTERNAL_SERVER_ERROR.phrase,

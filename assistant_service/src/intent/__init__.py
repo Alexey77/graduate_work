@@ -2,9 +2,9 @@ import json
 
 from core.config import IntentSettings
 from core.logger import get_logger
-
 from llm import LLMClient, LLMException
 from schemes import LLMResponse
+
 from .exception import IntentException
 
 logger = get_logger(__name__)

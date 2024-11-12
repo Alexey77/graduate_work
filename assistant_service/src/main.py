@@ -1,13 +1,12 @@
 from contextlib import asynccontextmanager
 
 import uvicorn
-from fastapi import FastAPI
-from fastapi.responses import ORJSONResponse
-
 from api.v1 import chat, healthy
 from core.config import settings
 from core.logger import get_logger
 from database.mongodb import AsyncMongoClient
+from fastapi import FastAPI
+from fastapi.responses import ORJSONResponse
 from llm import LLMClient
 
 logger = get_logger(__name__)

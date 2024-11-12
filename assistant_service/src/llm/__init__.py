@@ -5,7 +5,6 @@ from pathlib import Path
 from core.logger import get_logger
 from llm.exception import LLMException
 from schemes import LLMResponse
-from icecream import ic # TODO убрать
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -18,8 +17,12 @@ current_dir = Path(__file__).parent.parent.resolve()
 grpc_generated_path = current_dir / 'grpc_generated'
 sys.path.insert(0, str(grpc_generated_path))
 
-from grpc_generated import (llm_pb2, llm_pb2_grpc, similarity_search_pb2,
-                            similarity_search_pb2_grpc)
+from grpc_generated import (
+    llm_pb2,
+    llm_pb2_grpc,
+    similarity_search_pb2,
+    similarity_search_pb2_grpc,
+)
 
 
 class LLMClient:
@@ -71,13 +74,8 @@ class LLMClient:
             function_call: str
     ) -> LLMResponse:
 
-        ic(self.address)
-
-
         async with grpc.aio.insecure_channel(self.address) as channel:
             stub = llm_pb2_grpc.LlmServiceStub(channel)
-
-            ic(stub)
 
             request = llm_pb2.LLMFunctionRequest(
                 service=service,
@@ -89,10 +87,9 @@ class LLMClient:
                 function_call=function_call
             )
 
-            ic(request)
-
             try:
                 response: llm_pb2.LLMFunctionResponse = await stub.GetFunctions(request)
+                logger.info(response)
 
                 return LLMResponse(
                     status_code=response.status_code,

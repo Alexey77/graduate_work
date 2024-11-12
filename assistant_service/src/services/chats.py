@@ -1,17 +1,15 @@
 import json
 from functools import lru_cache
 
-from fastapi import Depends
-
-from core.config import IntentSettings, settings
+from core.config import settings
 from core.logger import get_logger
 from dependencies import get_llm_client
+from fastapi import Depends
+from icecream import ic
 from llm import LLMClient
 from prompts import get_system_prompt_for_function
 from schemes import AssistantMessage, UserMessage
 from services.exception import ChatException
-
-from icecream import ic  # TODO убрать
 
 logger = get_logger(__name__)
 
@@ -22,14 +20,21 @@ class ChatService:
 
     async def get_answer(self, messages: list[UserMessage | AssistantMessage], user: str):
 
-        functions_description = self.create_list_functions_description()
-        ic(functions_description)
-
-        intent_function = await self._determine_intent([msg.model_dump() for msg in messages])
-
+        intent_function: dict = await self._determine_intent([msg.model_dump() for msg in messages])
         ic(intent_function)
 
-        return await self.handle_unknown_intent(answer="С вами говорит Телевизор.", messages=messages)
+        try:
+            method = intent_function["name"]
+            arguments = json.loads(intent_function["arguments"])
+        except KeyError:
+            raise ChatException
+
+        answer = await getattr(self, method)(**arguments)
+
+        messages.append(AssistantMessage(role="assistant",
+                                         content=answer))
+
+        return messages
 
     async def _determine_intent(self, messages, **kwargs):
 
@@ -44,10 +49,7 @@ class ChatService:
                                                      function_call=kwargs.get("function_call", "auto")
                                                      )
 
-
-
-
-        except Exception as e:
+        except Exception as e:  # noqa BLE001
             logger.error(str(e))
             raise ChatException(e)
 
@@ -79,7 +81,7 @@ class ChatService:
 
         return result
 
-    async def get_information_from_rag(self, eng: str, rus: str):
+    async def get_information_from_rag(self, eng: str, rus: str) -> str:
         """
         {
             "description": "Extracts the main intent of the user's query and forms a search query in both Russian and English.",
@@ -100,7 +102,9 @@ class ChatService:
         }
         """
 
-    async def handle_unknown_intent(self, answer: str, messages: list[UserMessage | AssistantMessage]) -> list[UserMessage | AssistantMessage]:
+        return f"RAG rus:{rus}, eng:{eng}"
+
+    async def handle_unknown_intent(self, answer: str) -> str:
         """
         {
         "description": "Handles an unknown or unclear user intent.",
@@ -117,9 +121,7 @@ class ChatService:
         }
         """
 
-        messages.append(AssistantMessage(role="assistant", content=answer))
-
-        return messages
+        return answer
 
 
 @lru_cache

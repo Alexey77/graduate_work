@@ -1,11 +1,10 @@
 import json
 from functools import lru_cache
-from typing import TYPE_CHECKING, Any
-
-from fastapi import Depends
+from typing import Any
 
 from core.logger import get_logger
 from dependencies import get_llm_client
+from fastapi import Depends
 from llm import LLMClient
 from schemes import ReplyResponseModel, Role
 

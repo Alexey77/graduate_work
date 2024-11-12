@@ -5,7 +5,7 @@ import aiohttp
 
 class TestChatCompletion(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
-        self.url = f"http://assistant_service:8000/api/v1/chat/completion"
+        self.url = "http://assistant_service:8000/api/v1/chat/completion"
 
     async def test_completion_valid_request(self):
         headers = {'Content-Type': 'application/json'}
