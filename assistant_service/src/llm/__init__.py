@@ -3,7 +3,9 @@ import warnings
 from pathlib import Path
 
 from core.logger import get_logger
-from schemes import RAGResponse
+from llm.exception import LLMException
+from schemes import LLMResponse
+from icecream import ic # TODO убрать
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -26,25 +28,6 @@ class LLMClient:
         self.channel: grpc.aio.Channel | None = None
         self.stub: llm_pb2_grpc.LlmServiceStub | None = None
 
-    async def get_similar_fragments(self, text: str, limit: int = 5) -> list:
-        async with grpc.aio.insecure_channel("text_vector_service:50052") as channel:
-            similarity_stub = similarity_search_pb2_grpc.SimilaritySearchServiceStub(channel)
-            similarity_request = similarity_search_pb2.SearchRequest(
-                text=text,
-                collection="text_fragments",
-                limit=limit
-            )
-
-            similarity_response = await similarity_stub.SearchSimilarFragments(similarity_request)
-
-            logger.info(similarity_response)
-            similar_fragments = [
-                {"text": result.text, "score": result.score, "meta": result.meta}
-                for result in similarity_response.similar_fragments
-            ]
-
-            return similar_fragments
-
     async def get_completion(
             self,
             service: llm_pb2.ApiServiceName,
@@ -52,7 +35,7 @@ class LLMClient:
             system: str,
             max_tokens: int,
             messages: str
-    ) -> RAGResponse:
+    ) -> LLMResponse:
         async with grpc.aio.insecure_channel(self.address) as channel:
             stub = llm_pb2_grpc.LlmServiceStub(channel)
 
@@ -67,7 +50,7 @@ class LLMClient:
             try:
                 response: llm_pb2.LLMResponse = await stub.GetCompletion(request)
 
-                return RAGResponse(
+                return LLMResponse(
                     status_code=response.status_code,
                     reply=response.reply,
                     response=response.response
@@ -75,4 +58,48 @@ class LLMClient:
             except grpc.aio.AioRpcError as e:
                 msg = f"gRPC error: {e.code()} - {e.details()}"
                 logger.error(msg)
-                raise
+                raise LLMException(msg)
+
+    async def get_functions(
+            self,
+            service: llm_pb2.ApiServiceName,
+            model: str,
+            system: str,
+            max_tokens: int,
+            messages: str,
+            functions: str,
+            function_call: str
+    ) -> LLMResponse:
+
+        ic(self.address)
+
+
+        async with grpc.aio.insecure_channel(self.address) as channel:
+            stub = llm_pb2_grpc.LlmServiceStub(channel)
+
+            ic(stub)
+
+            request = llm_pb2.LLMFunctionRequest(
+                service=service,
+                model=model,
+                system=system,
+                max_tokens=max_tokens,
+                messages=messages,
+                functions=functions,
+                function_call=function_call
+            )
+
+            ic(request)
+
+            try:
+                response: llm_pb2.LLMFunctionResponse = await stub.GetFunctions(request)
+
+                return LLMResponse(
+                    status_code=response.status_code,
+                    reply=response.reply,
+                    response=response.response
+                )
+            except grpc.aio.AioRpcError as e:
+                msg = f"gRPC error: {e.code()} - {e.details()}"
+                logger.error(msg)
+                raise LLMException(msg)
