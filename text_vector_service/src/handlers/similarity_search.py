@@ -15,16 +15,21 @@ class SimilaritySearchServicer(similarity_search_pb2_grpc.SimilaritySearchServic
         self.qdrant_client = QdrantClient(host=settings.HOST, port=settings.PORT)
 
     async def SearchSimilarFragments(self, request, context):
+        logger.info(f"Received search request: text='{request.text}', collection='{request.collection}', limit={request.limit}")
+
         try:
             model = self.manager_model.get_model("intfloat/multilingual-e5-small")
             if model is None:
+                logger.warning("Model intfloat/multilingual-e5-small not found")
                 context.set_code(grpc.StatusCode.NOT_FOUND)
                 context.set_details("Model intfloat/multilingual-e5-small not found.")
                 return similarity_search_pb2.SearchResponse()
 
+            logger.info("Encoding query text into vector")
             query_vector = model.encode(request.text).tolist()
 
             try:
+                logger.info(f"Searching in collection '{request.collection}' with limit {min(request.limit, 10)}")
                 search_results = self.qdrant_client.search(
                     collection_name=request.collection,
                     query_vector=query_vector,
@@ -38,14 +43,21 @@ class SimilaritySearchServicer(similarity_search_pb2_grpc.SimilaritySearchServic
 
             fragment_results = []
             for result in search_results:
+                meta = {
+                    "page_id": result.payload.get("page_id"),
+                    "title": result.payload.get("title"),
+                    "time_request": result.payload.get("time_request"),
+                }
+
                 fragment_results.append(
                     similarity_search_pb2.FragmentResult(
-                        text=result.payload.get("source", ""),
-                        meta=json.dumps(result.payload.get("metadata", {})),
+                        text=result.payload.get("text", ""),
+                        meta=json.dumps(meta, ensure_ascii=False),
                         score=result.score
                     )
                 )
 
+            logger.info("Returning search response with results")
             return similarity_search_pb2.SearchResponse(similar_fragments=fragment_results)
 
         except (grpc.RpcError, ValueError, TypeError) as e:

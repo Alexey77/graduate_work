@@ -25,17 +25,23 @@ class ModelManager:
 
     def _load_model(self, model_name):
         if model_name in self._models:
+            logger.info(f"Model '{model_name}' is already loaded, retrieving from cache.")
             return self._models[model_name]
         else:
             logger.info(f"Starting to load model '{model_name}'")
-            device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+            cuda_available = torch.cuda.is_available()
+            device = 'cuda' if cuda_available else 'cpu'
+            logger.info(f"CUDA available: {cuda_available}. Loading model on '{device}'.")
+
             model = SentenceTransformer(
                 model_name_or_path=model_name,
                 device=device,
                 cache_folder=self._settings.LOCAL_MODEL_PATH
             )
+
             self._models[model_name] = model
-            logger.info(f"Model '{model_name}' loaded successfully")
+            logger.info(f"Model '{model_name}' loaded successfully on '{device}'")
             return model
 
     def get_model(self, model_name=None) -> SentenceTransformer:

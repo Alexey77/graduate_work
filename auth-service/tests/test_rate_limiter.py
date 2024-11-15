@@ -1,8 +1,9 @@
-import aiohttp
 import asyncio
 import logging
 import random
 import time
+
+import aiohttp
 
 
 async def fetch(session, url, headers):

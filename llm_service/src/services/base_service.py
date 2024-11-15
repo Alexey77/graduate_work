@@ -20,4 +20,5 @@ class BaseLLMService(ABC):
     @abstractmethod
     def get_reply(self, response: dict[str, Any]) -> list[dict]: ...
 
-    """Extracts and returns the assistant's reply content from the response."""
+    @abstractmethod
+    def prepare_data_with_functions(self, model_name: str, system_prompt: str, max_tokens: int, messages, functions, function_call): ...

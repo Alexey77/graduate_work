@@ -3,7 +3,6 @@ import warnings
 from pathlib import Path
 
 from core.logger import get_logger
-from llm.exception import LLMException
 from schemes import LLMResponse
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -25,11 +24,29 @@ from grpc_generated import (
 )
 
 
-class LLMClient:
+class TextVectorClient:
     def __init__(self, address: str):
         self.address = address
         self.channel: grpc.aio.Channel | None = None
         self.stub: llm_pb2_grpc.LlmServiceStub | None = None
+
+    async def get_similar_fragments(self, text: str, limit: int = 5) -> list:
+        async with grpc.aio.insecure_channel(self.address) as channel:
+            similarity_stub = similarity_search_pb2_grpc.SimilaritySearchServiceStub(channel)
+            similarity_request = similarity_search_pb2.SearchRequest(
+                text=text,
+                collection="docs",
+                limit=limit
+            )
+
+            similarity_response = await similarity_stub.SearchSimilarFragments(similarity_request)
+
+            similar_fragments = [
+                {"text": result.text, "score": result.score, "meta": result.meta}
+                for result in similarity_response.similar_fragments
+            ]
+
+            return similar_fragments
 
     async def get_completion(
             self,
@@ -61,7 +78,7 @@ class LLMClient:
             except grpc.aio.AioRpcError as e:
                 msg = f"gRPC error: {e.code()} - {e.details()}"
                 logger.error(msg)
-                raise LLMException(msg)
+                raise
 
     async def get_functions(
             self,
@@ -73,7 +90,6 @@ class LLMClient:
             functions: str,
             function_call: str
     ) -> LLMResponse:
-
         async with grpc.aio.insecure_channel(self.address) as channel:
             stub = llm_pb2_grpc.LlmServiceStub(channel)
 
@@ -89,7 +105,6 @@ class LLMClient:
 
             try:
                 response: llm_pb2.LLMFunctionResponse = await stub.GetFunctions(request)
-                logger.info(response)
 
                 return LLMResponse(
                     status_code=response.status_code,
@@ -99,4 +114,4 @@ class LLMClient:
             except grpc.aio.AioRpcError as e:
                 msg = f"gRPC error: {e.code()} - {e.details()}"
                 logger.error(msg)
-                raise LLMException(msg)
+                raise

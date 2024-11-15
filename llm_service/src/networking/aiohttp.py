@@ -12,7 +12,7 @@ logger = get_logger(__name__)
 async def send_post(url: str, data: dict, headers: dict, proxy: ProxySocks5 | None = None) -> tuple[int, dict | str]:
     """Send POST request using aiohttp, optionally with SOCKS5 proxy."""
     try:
-        logger.info(f"Sending POST request to {url} with data={data} and headers={headers}")
+        logger.info(f"Sending POST request to {url} with data={data}")
 
         connector = None
         if proxy:

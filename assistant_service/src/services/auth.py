@@ -3,10 +3,9 @@ from functools import lru_cache
 
 import aiohttp
 import jwt
-from fastapi.exceptions import HTTPException
-
 from core.config import AuthServiceSettings, auth_service_settings
 from core.logger import get_logger
+from fastapi.exceptions import HTTPException
 from schemes import User
 
 logger = get_logger(__name__)

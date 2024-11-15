@@ -13,17 +13,20 @@ class RequestAsk(BaseModel):
     content: Annotated[str, Field(min_length=1, max_length=4096)]
 
 
-class RequestReply(BaseModel):
-    id_ask: UUID4
+class SystemMessage(BaseModel):
+    role: Literal["system"]
+    content: Annotated[str, Field(min_length=1, max_length=65_536)]
 
 
 class UserMessage(BaseModel):
     role: Literal["user"]
     content: Annotated[str, Field(min_length=1, max_length=4_096)]
 
+
 class AssistantMessage(BaseModel):
     role: Literal["assistant"]
     content: Annotated[str, Field(min_length=1, max_length=16_384)]
+
 
 # Response
 
@@ -32,16 +35,11 @@ class ChatMessage(BaseModel):
     content: Annotated[str, Field(min_length=1, max_length=4096)]
 
 
-
-class ChatResponse(BaseModel):
-    messages: list[ChatMessage]
-
-
 class ResponseCreatedAsk(BaseModel):
     id_ask: UUID4
 
 
-class RAGResponse(BaseModel):
+class LLMResponse(BaseModel):
     status_code: int
     reply: str
     response: str | dict
@@ -55,23 +53,14 @@ class RAGResponse(BaseModel):
         return values
 
 
-class ResponseCreatedUnauthorizedAsk(ResponseCreatedAsk):
-    id_ask: UUID4 = UUID("77777777-7777-4777-8777-777777777777")
-
-
 class Role(str, Enum):
     user = "user"
     guest = "guest"
     assistant = "assistant"
 
 
-class MessageModel(BaseModel):
-    role: Role
-    content: Annotated[str, Field(min_length=1, max_length=4096)]
-
-
 class ReplyResponseModel(BaseModel):
-    messages: list[MessageModel]
+    messages: list[SystemMessage | UserMessage | AssistantMessage]
 
 
 class ResponseMessage(BaseModel):

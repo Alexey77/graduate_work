@@ -13,7 +13,6 @@ class OpenAIService(BaseLLMService):
         self._api_key = api_key
         self._base_url = base_url
         logger.info(f"Initialized ProxyAPIService with base_url:{self._base_url}")
-        logger.info(f"_api_key:{self._api_key}")
 
     def prepare_headers(self) -> dict:
         headers = {

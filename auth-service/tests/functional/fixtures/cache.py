@@ -1,5 +1,6 @@
 import aioredis
 import pytest_asyncio
+
 from functional.settings import cache_settings
 
 

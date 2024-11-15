@@ -1,5 +1,6 @@
 import aiohttp
 import pytest_asyncio
+
 from functional.settings import service_settings
 
 
