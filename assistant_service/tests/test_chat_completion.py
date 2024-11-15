@@ -14,16 +14,15 @@ class TestChatCompletion(unittest.IsolatedAsyncioTestCase):
             "content": "Привет!"
         }
 
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.url, headers=headers, json=data) as response:
-                self.assertEqual(response.status, 200)
-                content = await response.json()
-                self.assertIn("messages", content)
-                self.assertEqual(len(content["messages"]), 2)
-                self.assertEqual(content["messages"][0]["role"], "user")
-                self.assertEqual(content["messages"][0]["content"], "Привет!")
-                self.assertEqual(content["messages"][1]["role"], "assistant")
-                self.assertTrue(len(content["messages"][1]["content"]) > 0)
+        async with aiohttp.ClientSession() as session, session.post(self.url, headers=headers, json=data) as response:
+            self.assertEqual(response.status, 200)
+            content = await response.json()
+            self.assertIn("messages", content)
+            self.assertEqual(len(content["messages"]), 2)
+            self.assertEqual(content["messages"][0]["role"], "user")
+            self.assertEqual(content["messages"][0]["content"], "Привет!")
+            self.assertEqual(content["messages"][1]["role"], "assistant")
+            self.assertTrue(len(content["messages"][1]["content"]) > 0)
 
     async def test_completion_invalid_request(self):
         headers = {'Content-Type': 'application/json'}
@@ -32,9 +31,8 @@ class TestChatCompletion(unittest.IsolatedAsyncioTestCase):
             "content": ""
         }
 
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.url, headers=headers, json=data) as response:
-                self.assertEqual(response.status, 422)
+        async with aiohttp.ClientSession() as session, session.post(self.url, headers=headers, json=data) as response:
+            self.assertEqual(response.status, 422)
 
     async def test_completion_invalid_role(self):
         headers = {'Content-Type': 'application/json'}
@@ -43,6 +41,5 @@ class TestChatCompletion(unittest.IsolatedAsyncioTestCase):
             "content": "Some content"
         }
 
-        async with aiohttp.ClientSession() as session:
-            async with session.post(self.url, headers=headers, json=data) as response:
-                self.assertEqual(response.status, 422)
+        async with aiohttp.ClientSession() as session, session.post(self.url, headers=headers, json=data) as response:
+            self.assertEqual(response.status, 422)

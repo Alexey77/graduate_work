@@ -3,25 +3,31 @@ from functools import lru_cache
 
 from core.config import settings
 from core.logger import get_logger
-from dependencies import get_llm_client
+from dependencies import get_llm_client, get_text_vector_client
 from fastapi import Depends
-from icecream import ic
+from grpc.aio import AioRpcError
 from llm import LLMClient
-from prompts import get_system_prompt_for_function
-from schemes import AssistantMessage, UserMessage
+from prompts import get_system_prompt_for_function, get_system_prompt_for_rag
+from schemes import AssistantMessage, SystemMessage, UserMessage
 from services.exception import ChatException
+
+from text_vector_service import TextVectorClient
 
 logger = get_logger(__name__)
 
 
 class ChatService:
-    def __init__(self, llm_client: LLMClient):
+    def __init__(self, llm_client: LLMClient, text_vector_client: TextVectorClient):
         self._llm = llm_client
+        self._text_vector = text_vector_client
 
     async def get_answer(self, messages: list[UserMessage | AssistantMessage], user: str):
 
         intent_function: dict = await self._determine_intent([msg.model_dump() for msg in messages])
-        ic(intent_function)
+
+        # Пример intent_function на запрос - "какой актер играл Ломоносова"
+        # intent_function = {"arguments": '{"eng": "Which actor played Lomonosov?", "rus": "Какой актер играл Ломоносова?"}',
+        #                    "name": "get_information_from_rag"}
 
         try:
             method = intent_function["name"]
@@ -29,10 +35,10 @@ class ChatService:
         except KeyError:
             raise ChatException
 
-        answer = await getattr(self, method)(**arguments)
+        messages = await getattr(self, method)(messages, **arguments)
 
-        messages.append(AssistantMessage(role="assistant",
-                                         content=answer))
+        # messages.append(AssistantMessage(role="assistant",
+        #                                  content=answer))
 
         return messages
 
@@ -49,6 +55,9 @@ class ChatService:
                                                      function_call=kwargs.get("function_call", "auto")
                                                      )
 
+        except AioRpcError as e:
+            logger.error(str(e))
+            raise ChatException(e)
         except Exception as e:  # noqa BLE001
             logger.error(str(e))
             raise ChatException(e)
@@ -81,7 +90,7 @@ class ChatService:
 
         return result
 
-    async def get_information_from_rag(self, eng: str, rus: str) -> str:
+    async def get_information_from_rag(self, messages: list, eng: str, rus: str) -> list:
         """
         {
             "description": "Extracts the main intent of the user's query and forms a search query in both Russian and English.",
@@ -102,9 +111,53 @@ class ChatService:
         }
         """
 
-        return f"RAG rus:{rus}, eng:{eng}"
+        enrich_data = await self._enrich_data_for_rag(text_query=rus)
 
-    async def handle_unknown_intent(self, answer: str) -> str:
+        system_prompt = get_system_prompt_for_rag(enrich_data)
+
+        try:
+            response = await self._llm.get_completion(service=settings.RAG.SERVICE,
+                                                      model=settings.RAG.MODEL,
+                                                      system=system_prompt,
+                                                      max_tokens=settings.RAG.MAX_TOKEN,
+                                                      messages=json.dumps([msg.model_dump() for msg in messages], ensure_ascii=False),
+                                                      )
+
+        except AioRpcError as e:
+            logger.error(str(e))
+            raise ChatException(e)
+        except Exception as e:  # noqa BLE001
+            logger.error(str(e))
+            raise ChatException(e)
+
+        if response.status_code == 200:
+            messages.insert(0, SystemMessage(role="system", content=system_prompt))
+            messages.append(AssistantMessage(role="assistant", content=response.reply))
+            return messages
+
+        msg = f"Intent classification failed with status code {response.status_code} and reply: {response.response}"
+        logger.error(msg)
+        raise ChatException(msg)
+
+    async def _enrich_data_for_rag(self, text_query: str, limit=10) -> str:
+
+        try:
+            response = await self._text_vector.get_similar_fragments(text=text_query, limit=limit)
+        except AioRpcError as e:
+            logger.error(str(e))
+            raise ChatException(e)
+        except Exception as e:  # noqa BLE001
+            logger.error(str(e))
+            raise ChatException(e)
+
+        result = []
+        if isinstance(response, list):
+            for item in response:
+                result.append(item.get("text", ""))
+
+        return "\n".join(result)
+
+    async def handle_unknown_intent(self, messages: list, answer: str) -> list:
         """
         {
         "description": "Handles an unknown or unclear user intent.",
@@ -121,13 +174,19 @@ class ChatService:
         }
         """
 
-        return answer
+        messages.append(AssistantMessage(role="assistant",
+                                         content="Ничего не понял, но очень интересно"))
+
+        return messages
 
 
 @lru_cache
 def get_chat_service(
-        llm_client=Depends(get_llm_client)
+        llm_client=Depends(get_llm_client),
+        text_vector_client=Depends(get_text_vector_client)
+
 ) -> ChatService:
     return ChatService(
-        llm_client
+        llm_client,
+        text_vector_client
     )

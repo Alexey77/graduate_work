@@ -28,6 +28,7 @@ from handlers.similarity_search import SimilaritySearchServicer
 
 logger = get_logger(__name__)
 
+
 async def stop_server(server, db_connection, manager_model):
     await server.stop(settings.TIMEOUT)
     logger.info("Server stopped successfully.")
@@ -51,13 +52,13 @@ async def serve():
     encoder_pb2_grpc.add_EncoderServiceServicer_to_server(encode_servicer, server)
     similarity_search_pb2_grpc.add_SimilaritySearchServiceServicer_to_server(similarity_search_servicer, server)
 
-    SERVICE_NAMES = (
+    service_names = (
         encoder_pb2.DESCRIPTOR.services_by_name['EncoderService'].full_name,
         similarity_search_pb2.DESCRIPTOR.services_by_name['SimilaritySearchService'].full_name,
         reflection.SERVICE_NAME,
     )
 
-    reflection.enable_server_reflection(SERVICE_NAMES, server)
+    reflection.enable_server_reflection(service_names, server)
 
     server.add_insecure_port(f'{settings.HOST}:{settings.PORT}')
     logger.info(f"The server is running on host: {settings.HOST}, port:{settings.PORT}")
@@ -66,13 +67,13 @@ async def serve():
 
     await server.start()
 
-    def graceful_shutdown():
+    def graceful_shutdown(signum, frame):
         logger.info("Shutting down gracefully...")
         asyncio.create_task(stop_server(server, db_connection, manager_model))
+        logger.info("Server successfully stopped")
 
-    loop = asyncio.get_running_loop()
-    for sig in (signal.SIGINT, signal.SIGTERM):
-        loop.add_signal_handler(sig, graceful_shutdown)
+    signal.signal(signal.SIGINT, graceful_shutdown)
+    signal.signal(signal.SIGTERM, graceful_shutdown)
 
     await server.wait_for_termination()
 

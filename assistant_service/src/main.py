@@ -9,6 +9,8 @@ from fastapi import FastAPI
 from fastapi.responses import ORJSONResponse
 from llm import LLMClient
 
+from text_vector_service import TextVectorClient
+
 logger = get_logger(__name__)
 
 
@@ -17,7 +19,8 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Service started")
     app.state.mongo = AsyncMongoClient(settings.MONGO.uri)
-    app.state.llm = LLMClient(address=f"{settings.LLM.HOST}:{settings.LLM.PORT}")
+    app.state.llm = LLMClient(address=settings.LLM.address)
+    app.state.text_vector = TextVectorClient(address=settings.TEXT_VECTOR.address)
 
     # Shutdown
     try:

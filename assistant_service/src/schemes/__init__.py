@@ -13,13 +13,9 @@ class RequestAsk(BaseModel):
     content: Annotated[str, Field(min_length=1, max_length=4096)]
 
 
-class RequestReply(BaseModel):
-    id_ask: UUID4
-
-
 class SystemMessage(BaseModel):
     role: Literal["system"]
-    content: Annotated[str, Field(min_length=1, max_length=4_096)]
+    content: Annotated[str, Field(min_length=1, max_length=65_536)]
 
 
 class UserMessage(BaseModel):
@@ -39,10 +35,6 @@ class ChatMessage(BaseModel):
     content: Annotated[str, Field(min_length=1, max_length=4096)]
 
 
-class ChatResponse(BaseModel):
-    messages: list[ChatMessage]
-
-
 class ResponseCreatedAsk(BaseModel):
     id_ask: UUID4
 
@@ -59,10 +51,6 @@ class LLMResponse(BaseModel):
         if "reply" in values and isinstance(values["reply"], str):
             values["reply"] = values["reply"].strip(' "\'')
         return values
-
-
-class ResponseCreatedUnauthorizedAsk(ResponseCreatedAsk):
-    id_ask: UUID4 = UUID("77777777-7777-4777-8777-777777777777")
 
 
 class Role(str, Enum):

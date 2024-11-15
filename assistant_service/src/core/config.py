@@ -34,6 +34,7 @@ class IntentSettings(BaseSettings):
 class RAGSettings(BaseSettings):
     SERVICE: Annotated[int, Field(gt=0, lt=5)]
     MODEL: Annotated[str, Field(min_length=1)]
+    MAX_TOKEN: Annotated[int, Field(gt=0, lt=65_536)]
 
     model_config = SettingsConfigDict(
         env_prefix='RAG_',
@@ -55,6 +56,27 @@ class LLMService(BaseSettings):
         extra='ignore',
         env_file_encoding='utf-8'
     )
+
+    @property
+    def address(self) -> str:
+        return f"{self.HOST}:{self.PORT}"
+
+
+class TextVectorService(BaseSettings):
+    HOST: Annotated[str, Field(min_length=1)]
+    PORT: Annotated[int, Field(gt=1023, lt=65536)]
+    DEFAULT_MODEL: Annotated[str, Field(min_length=1)]
+
+    model_config = SettingsConfigDict(
+        env_prefix='TEXTVECTOR_',
+        env_file='.env',
+        extra='ignore',
+        env_file_encoding='utf-8'
+    )
+
+    @property
+    def address(self) -> str:
+        return f"{self.HOST}:{self.PORT}"
 
 
 class MongoDBSettings(BaseSettings):
@@ -87,6 +109,7 @@ class Settings(BaseSettings):
 
     MONGO: MongoDBSettings = MongoDBSettings()
     LLM: LLMService = LLMService()
+    TEXT_VECTOR: TextVectorService = TextVectorService()
     INTENT: IntentSettings = IntentSettings()
     RAG: RAGSettings = RAGSettings()
 

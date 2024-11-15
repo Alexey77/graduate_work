@@ -1,5 +1,6 @@
 import asyncpg
 import pytest_asyncio
+
 from functional.settings import db_setting
 
 
