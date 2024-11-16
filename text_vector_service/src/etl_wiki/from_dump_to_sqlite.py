@@ -63,7 +63,7 @@ def get_revision_id(revision: ET.Element, ns: dict[str, str]) -> str | None:
 
 def insert_batch(cursor: sqlite3.Cursor, batch: list[tuple]) -> None:
     cursor.executemany('''
-        INSERT OR IGNORE INTO wiki_page 
+        INSERT OR IGNORE INTO wiki_page
         (page_id, title, wikitext, url, source, lang, revision_id, created_at, updated_at, time_request)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ''', batch)

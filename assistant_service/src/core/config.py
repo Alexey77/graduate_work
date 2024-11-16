@@ -6,17 +6,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AuthServiceSettings(BaseSettings):
-    pass
-    # url: Annotated[str, Field(min_length=1)]
-    # secret_key: Annotated[str, Field(min_length=1)]
-    # algorithm: Annotated[str, Field(default="HS256", min_length=1)]
-    #
-    # model_config = SettingsConfigDict(
-    #     env_prefix='AUTH_SERVICE_',
-    #     env_file='.env',
-    #     extra='ignore',
-    #     env_file_encoding='utf-8'
-    # )
+    url: Annotated[str, Field(min_length=1)]
+    secret_key: Annotated[str, Field(min_length=1)]
+    algorithm: Annotated[str, Field(default="HS256", min_length=1)]
+
+    model_config = SettingsConfigDict(
+        env_prefix='AUTH_SERVICE_',
+        env_file='.env',
+        extra='ignore',
+        env_file_encoding='utf-8'
+    )
 
 
 class IntentSettings(BaseSettings):
