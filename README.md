@@ -7,7 +7,7 @@ __Дипломная работа на курсе Яндекс Практику�
 
 ## Общая схема
 
-[![Scheme](scheme.png)](https://github.com/Alexey77/graduate_work/raw/main/docs/scheme.png)
+[![Scheme](scheme.png)](https://github.com/Alexey77/graduate_work/raw/main/cover.png)
 
 ## Сервисы созданные в рамках дипломного проекта
 
