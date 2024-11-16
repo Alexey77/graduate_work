@@ -19,3 +19,12 @@ class DialoguesMongoDB(AsyncMongoBase):
 
     async def add_new_dialogue(self, dialog: dict) -> InsertOneResult:
         return await self._insert_one(self._db_name, self._collection_name, dialog)
+
+    async def update_dialogue(self, dialog: dict) -> None:
+        query = {"_id": dialog["_id"]}
+        await self._update_one(
+            self._db_name,
+            self._collection_name,
+            query,
+            {"$set": {"messages": dialog["messages"], "update_at": dialog["update_at"]}}
+        )

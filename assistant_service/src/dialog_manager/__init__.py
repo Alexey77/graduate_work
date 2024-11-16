@@ -1,3 +1,4 @@
+from datetime import datetime
 from functools import lru_cache
 
 from core.logger import get_logger
@@ -16,21 +17,23 @@ class DialogManager:
     def __init__(self, db) -> None:
         self._db: DialoguesMongoDB = db
 
-    async def create_dialog(self, content: str, user: str) -> UUID4:
+    async def create_dialog(self, user: str) -> UUID4:
         new_dialog = DialogModel.new(user=user)
-
-        system_message = get_system_message()
-        new_dialog.messages.append(system_message)
-
-        message_user = get_message_user(content=content,
-                                        id_msg=str(new_dialog.id_last_ask),
-                                        created_at=new_dialog.created_at)
-
-        new_dialog.messages.append(message_user)
-
         await self._db.add_new_dialogue(dialog=new_dialog.to_mongodb())
         logger.info(f"Added a new dialog with _id:{new_dialog.id_dialog}")
-        return new_dialog.id_last_ask
+        return new_dialog.id_dialog
+
+    async def save_dialog(self, dialog_id: UUID4, messages: list) -> None:
+        dialog_data = await self._db.find_dialog_by_id(dialog_id)
+        if not dialog_data:
+            logger.error(f"Dialog with _id:{dialog_id} not found")
+            return
+
+        dialog = DialogModel(**dialog_data)
+        dialog.update_at = datetime.utcnow()
+        dialog.messages.extend([msg.dict() for msg in messages])
+        await self._db.update_dialogue(dialog=dialog.to_mongodb())
+        logger.info(f"Dialog with _id:{dialog.id_dialog} updated")
 
 
 @lru_cache

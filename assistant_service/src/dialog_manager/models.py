@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 from enum import Enum
 
-from pydantic import UUID4, BaseModel, Field
+from pydantic import UUID4, BaseModel, Field, AliasChoices
 
 
 class DialogRoles(str, Enum):
@@ -13,8 +13,8 @@ class DialogRoles(str, Enum):
 
 
 class DialogModel(BaseModel):
-    id_dialog: UUID4
-    id_last_ask: UUID4
+    id_dialog: UUID4 = Field(alias=AliasChoices("_id", "id_dialog"))
+    id_last_ask: UUID4 = Field(alias=AliasChoices("last_ask", "id_last_ask"))
     user: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     update_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
@@ -48,6 +48,7 @@ class MessageUser(BaseModel):
     role: DialogRoles = DialogRoles.user
     content: str
     created_at: datetime
+
 
 class SystemPrompt(BaseModel):
     id: str
