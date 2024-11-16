@@ -24,6 +24,42 @@ services:
       - SERVICE_PORT=8000
     command: pytest -s
 
+  auth_service:
+    build: ./auth-service
+    ports:
+      - "8001:8000"
+    env_file:
+      - ./auth-service/.env
+    depends_on:
+      - auth_db
+      - redis
+    healthcheck:
+      test: [ "CMD-SHELL", "curl --fail -H 'X-Request-Id: healthcheck' http://localhost:8000/api/v1/healthy/live || exit 1" ]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+
+  auth_db:
+    image: postgres:16.3-alpine
+    container_name: auth_db
+    restart: always
+    env_file:
+      - ./auth-service/.env
+
+  redis:
+    image: redis:7.2.4
+    container_name: redis
+    restart: always
+    env_file:
+      - ./auth-service/.env
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG || exit 1" ]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+
   llm_service:
     build: ./llm_service
     ports:
@@ -77,15 +113,29 @@ services:
     ports:
       - "27017:27017"
 
-
   nginx:
     image: nginx:latest
     ports:
       - "80:80"
+      - "81:81"
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
     depends_on:
       - assistant_service
+      - auth_service
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    container_name: jaeger
+    ports:
+      - "16686:16686"
+      - "6831:6831/udp"
+      - "6832:6832/udp"
+      - "5778:5778"
+    restart: always
+    depends_on:
+      - nginx
 
 volumes:
   rabbitmq-data:

@@ -1,4 +1,5 @@
 import http
+import uuid
 from functools import lru_cache
 
 import aiohttp
@@ -30,12 +31,13 @@ class AuthService:
                 status_code=http.HTTPStatus.UNAUTHORIZED, detail="Invalid token"
             )
 
-    async def validate_access_token(self, access_token: str) -> None:
+    async def validate_access_token(self, access_token: str, request_id: str | None) -> None:
+        request_id = request_id or str(uuid.uuid4())
         async with (
             aiohttp.ClientSession() as session,
             session.post(
                 f"{self._base_url}/auth/token/validate",
-                headers={"Authorization": f"Bearer {access_token}"},
+                headers={"Authorization": f"Bearer {access_token}", "X-Request-Id": request_id},
             ) as response,
         ):
             response.raise_for_status()
@@ -45,13 +47,13 @@ class AuthService:
         return "morty.smith@earth.dimensionC137"
 
     async def get_current_user(
-        self, access_token: str, external_validation: bool = False
+        self, access_token: str, request_id: str, external_validation: bool = False
     ) -> User:
         # сначала проверяем что токен валидный и не истек, чтобы не делать лишний запрос на внешний сервис если токен невалидный
         user = self._decode_token(access_token)
         if external_validation:
             try:
-                await self.validate_access_token(access_token)
+                await self.validate_access_token(access_token, request_id)
             except aiohttp.ClientResponseError as e:
                 logger.warning("Failed to validate access token: %s", e)
                 raise HTTPException(
