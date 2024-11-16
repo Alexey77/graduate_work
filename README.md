@@ -45,6 +45,52 @@ GPRC сервис для взаимодействия с LLM
 
 Все сервисы завернуты в Docker
 
+
+### Run project
+
+1. Для запуска проекта в следующих директориях на основании `.env.example` файла нужно создать `.env` файл:
+
+- assistant_service
+- auth-service
+- llm_service
+- text_vector_service
+
+2. [загрузить датасет]
+3. Выполнить `docker-compose up -d --build`
+4. Создать нового пользователя
+   ```
+   curl -L -X POST 'http://localhost:81/api/v1/auth/register' \
+    -H 'Content-Type: application/json' \
+    --data-raw '{
+        "email": "test@example.com",
+        "password": "1234qwerty",
+        "first_name": "Test",
+        "last_name": "User"
+    }'
+   ```
+   
+5. Получить `access_token`
+    ```
+    curl -L -X POST 'http://localhost:81/api/v1/auth/login' \
+    -H 'Content-Type: application/json' \
+    --data-raw '{
+        "email": "test@example.com",
+        "password": "1234qwerty"
+    }'
+    ```
+6. Полученный токен использовать при запросе к ai-ассистенту
+    ```
+   curl -X 'POST' \
+      'http://localhost/api/v1/assistant/chat' \
+      -H 'accept: application/json' \
+      -H 'Authorization: Bearer ••••••' \
+      -H 'Content-Type: application/json' \
+      -d '{
+      "role": "user",
+      "content": "Какие фильмы сняты по сказкам Пушкина?"
+    }'
+    ```
+
 ### Other
 
 Реализован Github Actions для [линтера Ruff](https://github.com/Alexey77/graduate_work/blob/main/.github/workflows/lint.yml) и [pre-commit-config](https://github.com/Alexey77/graduate_work/blob/main/.pre-commit-config.yaml)  
