@@ -3,17 +3,52 @@ __Дипломная работа на курсе Яндекс Практику�
 
 [_Ссылка на этот репозиторий_](https://github.com/Alexey77/graduate_work)
 
-[![Scheme](cover.png)](https://github.com/Alexey77/graduate_work/raw/main/cover.png)
+[![Cover](cover.png)](https://github.com/Alexey77/graduate_work/raw/main/cover.png)
+
+## Общая схема
+
+[![Scheme](scheme.png)](https://github.com/Alexey77/graduate_work/raw/main/docs/scheme.png)
 
 ## Сервисы созданные в рамках дипломного проекта
 
-### Assistant service
+### [Auth service](https://github.com/Alexey77/graduate_work/tree/main/auth-service)
 
-### Text Vector Service
+Сервис аутентификацией и авторизацией пользователей.
+
+**Реализация**: FastAPI + JWT + Postgresql + SQLAlchemy + Alembic 
+
+### [Assistant service](https://github.com/Alexey77/graduate_work/tree/main/assistant_service)
+
+Сервис "AI-Ассистент" - единая точка входа для пользователей по всем вопросам онлайн кинотеатра.
+
+**Реализация**: FastAPI + MongoDB + client gRPC
+
+### [Text Vector Service](https://github.com/Alexey77/graduate_work/tree/main/text_vector_service)
 
 GPRC сервис для преобразования текста в векторное представление и поиска по векторной базе данных
 
-### LLM Service
+**Реализация**: server gRPC, Qdrant, TextEncoder
+
+### [LLM Service](https://github.com/Alexey77/graduate_work/tree/main/llm_service)
+
+GPRC сервис для взаимодействия с LLM
+
+**Реализация**: server gRPC, aiohttp, (можно доделать до локальной LLM модели)
+
+### [Wiki crawler](https://github.com/Alexey77/graduate_work/tree/main/wiki-scrapy-api-crawler)
+
+Парсер API Wiki [eng](https://www.mediawiki.org/wiki/API) | [rus](https://www.mediawiki.org/wiki/API/ru)
+
+**Реализация**: scrapy, SQLite, ETL из [SQLite в Qdrant](https://github.com/Alexey77/graduate_work/blob/main/text_vector_service/src/etl_wiki/run_etl_wiki.py), ETL из [Wikipedia dump в SQLite](https://github.com/Alexey77/graduate_work/blob/main/text_vector_service/src/etl_wiki/from_dump_to_sqlite.py)  
+
+### Docker
+
+Все сервисы завернуты в Docker
+
+### Other
+
+Реализован Github Actions для [линтера Ruff](https://github.com/Alexey77/graduate_work/blob/main/.github/workflows/lint.yml) и [pre-commit-config](https://github.com/Alexey77/graduate_work/blob/main/.pre-commit-config.yaml)  
+
 
 ### Участники команды:
 
