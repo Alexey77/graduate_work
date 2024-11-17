@@ -37,9 +37,6 @@ class ChatService:
 
         messages = await getattr(self, method)(messages, **arguments)
 
-        # messages.append(AssistantMessage(role="assistant",
-        #                                  content=answer))
-
         return messages
 
     async def _determine_intent(self, messages, **kwargs):
