@@ -11,16 +11,20 @@ import xml.etree.ElementTree as ET
 
 # Пути к файлам
 DUMP_FILE = 'E:\\temp\\wiki\\ruwiki-20241101-pages-meta-current.xml\\ruwiki-20241101-pages-meta-current.xml'
-DATABASE_FILE = 'wiki_pages.sqlite'
+DATABASE_FILE = 'E:\\temp\\wiki\\wiki_pages.sqlite'
 
 movie_phrases = {
     "кино", "фильм", "сериал", "телефильм",
-    "актер", "актриса",
+    "актер", "актёр", "актриса",
     "режиссер", "кинорежиссер",
     "оператор", "кинооператор",
     "сценарий", "сценарист",
     "кинопремия", "кинокомпания"
 }
+
+title_stop_words = ["(значения)"]
+text_stop_words = ["#перенаправление", "к удалению", "<noinclude>", "#REDIRECT"]
+min_length_text = 512
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -53,7 +57,9 @@ def compile_phrase_pattern(phrases: set[str]) -> Pattern:
 
 
 def contains_movie_phrase(text: str, pattern: Pattern) -> bool:
-    return bool(pattern.search(text))
+    check_length = min(1024, len(text))
+    text_to_check = text[:check_length]
+    return bool(pattern.search(text_to_check))
 
 
 def get_revision_id(revision: ET.Element, ns: dict[str, str]) -> str | None:
@@ -77,6 +83,10 @@ def process_page(elem: ET.Element, pattern: Pattern, ns: dict[str, str]) -> tupl
     page_id = elem.findtext('ns:id', namespaces=ns)
     title = elem.findtext('ns:title', namespaces=ns)
 
+    # Проверка стоп-слов в заголовке
+    if any(word in title for word in title_stop_words):
+        return None
+
     if page_id is None or title is None:
         return None
 
@@ -90,6 +100,9 @@ def process_page(elem: ET.Element, pattern: Pattern, ns: dict[str, str]) -> tupl
 
     text_elem = revision.find('ns:text', namespaces=ns)
     text = text_elem.text if text_elem is not None else ''
+
+    if len(text) < min_length_text or any(word in text for word in text_stop_words):
+        return None
 
     if contains_movie_phrase(text, pattern):
         current_time = datetime.now().isoformat()
