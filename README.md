@@ -55,7 +55,7 @@ GPRC сервис для взаимодействия с LLM
 - llm_service
 - text_vector_service
 
-2. Загрузить [dump Qdrant 2.3 Gb](https://storage.yandexcloud.net/yandex-practicum/docs-206350992826913-2024-11-17-06-14-05.7z), (не обязательно [dump SQlite 0.65 Gb](https://storage.yandexcloud.net/yandex-practicum/SQLite_wiki_pages.7z)) 
+2. Загрузить [dump Qdrant 0.9 Gb](https://storage.yandexcloud.net/yandex-practicum/docs-206350992826913-2024-11-17-17-31-15.7z), (не обязательно [dump SQlite 0.26 Gb](https://storage.yandexcloud.net/yandex-practicum/wiki_pages.7z)) 
 3. Выполнить `docker-compose up -d --build`
 4. Создать нового пользователя
    ```
@@ -94,6 +94,8 @@ GPRC сервис для взаимодействия с LLM
 ### Other
 
 Реализован Github Actions для [линтера Ruff](https://github.com/Alexey77/graduate_work/blob/main/.github/workflows/lint.yml) и [pre-commit-config](https://github.com/Alexey77/graduate_work/blob/main/.pre-commit-config.yaml)  
+
+### [Примеры ответов AI-Ассистента по RAG запросам](https://github.com/Alexey77/graduate_work/blob/main/docs/response.md)
 
 
 ### Участники команды:
