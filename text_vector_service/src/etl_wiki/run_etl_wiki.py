@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 BATCH_SIZE = 1000
 
-SQLITE_PATH = 'E:\\temp\\wiki\\wikipedia_movies_2.sqlite'
+SQLITE_PATH = 'E:\\temp\\wiki\\wiki_pages.sqlite'
 
 
 def get_vector_from_texts(model: SentenceTransformer, texts: list[str]) -> list[list[float]]:
@@ -27,7 +27,7 @@ def main():
                           port=vector_db_settings.PORT)
 
     db_path = SQLITE_PATH
-    max_docs = 10_000
+    # max_docs = 120
     max_docs = None
 
     logger.info("Setting up model manager and loading model.")
@@ -60,8 +60,9 @@ def main():
     for i, doc in enumerate(wiki_pages):
         logger.info(f"Processing wiki page {i}: ID {doc.page_id}, Title '{doc.title}'")
 
-        chunks = text_splitter.split_text(doc.text)
-        logger.info(f"Text split into {len(chunks)} chunks.")
+        title = f"Заголовок страницы: {doc.title}. Начало фрагмента:"
+        chunks = text_splitter.split_text(title=title, text=doc.text)
+        # logger.info(f"Text split into {len(chunks)} chunks.")
 
         vectors = get_vector_from_texts(model=model, texts=chunks)
         for chunk, vector in zip(chunks, vectors):
@@ -81,12 +82,12 @@ def main():
             point_id += 1
 
             if len(points_buffer) >= BATCH_SIZE:
-                logger.info(f"Upserting {len(points_buffer)} points to Qdrant.")
+                # logger.info(f"Upserting {len(points_buffer)} points to Qdrant.")
                 client.upsert(
                     collection_name=vector_db_settings.COLLECTION_NAME,
                     points=points_buffer
                 )
-                logger.info(f"Inserted {len(points_buffer)} points into Qdrant.")
+                # logger.info(f"Inserted {len(points_buffer)} points into Qdrant.")
                 points_buffer = []
 
     if points_buffer:

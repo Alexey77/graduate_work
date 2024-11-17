@@ -34,13 +34,16 @@ class EncoderSettings(BaseSettings):
     MODEL_NAME: Annotated[str, Field(min_length=1)]
     MAX_LENGTH: int = 512  # Long texts will be truncated to at most 512 tokens.
 
-    ALLOWED_MODELS: set[str] = {
-        "paraphrase-multilingual-mpnet-base-v2",
-        "distiluse-base-multilingual-cased-v2",
-        "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
-        "intfloat/multilingual-e5-large",
-        "intfloat/multilingual-e5-small"
-    }
+    ALLOWED_MODELS: set[str] = Field(
+        default_factory=lambda: {
+            "paraphrase-multilingual-mpnet-base-v2",
+            "distiluse-base-multilingual-cased-v2",
+            "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+            "intfloat/multilingual-e5-large",
+            "intfloat/multilingual-e5-small",
+            "deepvk/USER-base"  # only rus
+        }
+    )
 
     model_config = SettingsConfigDict(
         env_prefix='ENCODER_',
