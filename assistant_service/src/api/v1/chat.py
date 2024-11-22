@@ -1,10 +1,9 @@
 from http import HTTPStatus
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-
 from core.logger import get_logger
 from dialog_manager import DialogManager, get_db_dialogue_manager
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from schemes import ChatMessage, ReplyResponseModel, UserMessage
 from services.auth import AuthService, get_auth_service
 from services.chats import ChatService, get_chat_service
@@ -26,7 +25,7 @@ async def chat(
         auth_service: AuthService = Depends(get_auth_service),
         dialog_manager: DialogManager = Depends(get_db_dialogue_manager)
 ):
-    access_token = credentials.credentials # noqa F841
+    access_token = credentials.credentials
     user = await auth_service.get_current_user(
         access_token,
         request_id=request.headers.get('X-Request-Id'),
