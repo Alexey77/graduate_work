@@ -27,7 +27,6 @@ async def lifespan(app: FastAPI):
         yield
     finally:
 
-        # app.state.db.close()
         await app.state.mongo.close()
         logger.info("Service stopped")
 

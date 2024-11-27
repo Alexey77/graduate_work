@@ -2,7 +2,7 @@ import uuid
 from datetime import UTC, datetime
 from enum import Enum
 
-from pydantic import UUID4, BaseModel, Field, AliasChoices
+from pydantic import UUID4, AliasChoices, BaseModel, Field
 
 
 class DialogRoles(str, Enum):
