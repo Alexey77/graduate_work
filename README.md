@@ -1,7 +1,7 @@
-# «AI ассистент онлайн кинотеатра» 
+# «AI-ассистент онлайн-кинотеатра [реализация RAG системы]» 
 __Дипломная работа на курсе Яндекс Практикум "Расширенный курс мидл Python-разработчик" (11 месяцев)__
 
-__Такой программы больше нет. Есть программа на 6 месяцев ["Расширенный курс мидл Python-разработчик"](https://practicum.yandex.ru/middle-python/)__
+> **N.B.:** Такой программы в Яндекс Практикум больше нет. Есть программа на 6 месяцев ["Расширенный курс мидл Python-разработчик"](https://practicum.yandex.ru/middle-python/)
 
 [_Ссылка на этот репозиторий_](https://github.com/Alexey77/graduate_work)
 
@@ -13,19 +13,19 @@ __Такой программы больше нет. Есть программа
 
 ## Сервисы созданные в рамках дипломного проекта
 
-### [Auth service](https://github.com/Alexey77/graduate_work/tree/main/auth-service)
+### [1. Auth service](https://github.com/Alexey77/graduate_work/tree/main/auth-service)
 
 Сервис аутентификацией и авторизацией пользователей.
 
 **Реализация**: FastAPI + JWT + Postgresql + SQLAlchemy + Alembic 
 
-### [Assistant service](https://github.com/Alexey77/graduate_work/tree/main/assistant_service)
+### [2. Assistant service](https://github.com/Alexey77/graduate_work/tree/main/assistant_service)
 
 Сервис "AI-Ассистент" - единая точка входа для пользователей по всем вопросам онлайн кинотеатра.
 
 **Реализация**: FastAPI + MongoDB + client gRPC
 
-### [Text Vector Service](https://github.com/Alexey77/graduate_work/tree/main/text_vector_service)
+### [3. Text Vector Service](https://github.com/Alexey77/graduate_work/tree/main/text_vector_service)
 
 GPRC сервис для преобразования текста в векторное представление и поиска по векторной базе данных
 
@@ -33,13 +33,13 @@ GPRC сервис для преобразования текста в векто
 
 При первом старте идёт скачивание модели [intfloat/multilingual-e5-small](https://huggingface.co/intfloat/multilingual-e5-small)
 
-### [LLM Service](https://github.com/Alexey77/graduate_work/tree/main/llm_service)
+### [4. LLM Service](https://github.com/Alexey77/graduate_work/tree/main/llm_service)
 
 GPRC сервис для взаимодействия с LLM
 
 **Реализация**: server gRPC, aiohttp, (можно доделать до локальной LLM модели)
 
-Для работы с API OpenAI использовался сервис [proxyAPI.ru](proxyapi.ru)
+Для работы с API OpenAI использовался сервис [proxyAPI.ru](https://proxyapi.ru/)
 
 ### [Wiki crawler](https://github.com/Alexey77/graduate_work/tree/main/wiki-scrapy-api-crawler)
 
